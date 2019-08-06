@@ -1,3 +1,4 @@
+use crate::color::Color;
 use crate::errors::*;
 
 pub struct FrameBuffer {
@@ -16,8 +17,8 @@ impl FrameBuffer {
     pub fn width(&self) -> usize { self.width }
     pub fn buffer(&self) -> &Vec<u32> { &self.buffer }
 
-    pub fn set(&mut self, x: usize, y: usize, value: u32) {
-        self.buffer[(self.height - y - 1) * self.width + x] = value;
+    pub fn set(&mut self, x: usize, y: usize, color: Color) {
+        self.buffer[(self.height - y - 1) * self.width + x] = color.into();
     }
 }
 

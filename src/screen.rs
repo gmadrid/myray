@@ -18,11 +18,12 @@ impl Screen {
         Ok(Screen { fb, window })
     }
 
-    pub fn run<F>(&mut self, mut f: F) where F: FnMut(&mut FrameBuffer) -> () {
+    pub fn run<F>(&mut self, mut f: F) -> Result<()> where F: FnMut(&mut FrameBuffer) -> Result<()> {
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
-            f(&mut self.fb);
+            f(&mut self.fb)?;
             self.window.update_with_buffer(&self.fb.buffer()).unwrap();
         }
+        Ok(())
     }
 }
 
