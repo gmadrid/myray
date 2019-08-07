@@ -20,6 +20,7 @@ pub mod errors {
 
 }
 
+pub use camera::Camera;
 pub use color::Color;
 pub use hittest::{HitRecord, HitTest};
 pub use ray::Ray;
@@ -27,6 +28,7 @@ pub use screen::Screen;
 pub use sphere::Sphere;
 pub use vec3::{dot, Vec3};
 
+mod camera;
 mod color;
 mod fb;
 mod hittest;

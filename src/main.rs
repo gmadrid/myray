@@ -1,7 +1,7 @@
 use std::f32;
 
 use rays::errors::*;
-use rays::{Color, HitTest, Ray, Screen, Sphere, Vec3};
+use rays::{Color, HitTest, Ray, Screen, Sphere, Vec3, Camera};
 
 const WIDTH: usize = 640;
 const HEIGHT: usize = 480;
@@ -20,15 +20,11 @@ fn color(ray: &Ray, hit_test: &impl HitTest) -> Color {
 
 fn main() -> Result<()> {
     let mut screen = Screen::new(WIDTH, HEIGHT).unwrap();
+    let camera = Camera::new()?;
 
     screen.run(|fb| {
         let height = fb.height() as f32;
         let width = fb.width() as f32;
-
-        let lower_left_corner = Vec3::new(-2.0, -1.0, -1.0);
-        let horiz = Vec3::new(4.0, 0.0, 0.0);
-        let vert = Vec3::new(0.0, 2.0, 0.0);
-        let origin = Vec3::new(0.0, 0.0, 0.0);
 
         let vec = vec!{
             Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5)?,
@@ -38,7 +34,7 @@ fn main() -> Result<()> {
             for x in 0..WIDTH {
                 let u = x as f32 / width;
                 let v = y as f32 / height;
-                let r = Ray::new(origin, lower_left_corner + u * horiz + v * vert);
+                let r = camera.get_ray(u, v);
 
                 let col = color(&r, &vec);
                 fb.set(x, y, col);
