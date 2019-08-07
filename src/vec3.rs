@@ -43,7 +43,7 @@ impl Add<Vec3> for Vec3 {
     }
 }
 
-impl<'a> Sub<&'a Vec3> for &'a Vec3 {
+impl Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn sub(self, rhs: Self) -> Self::Output {
