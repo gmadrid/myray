@@ -38,7 +38,7 @@ fn main() -> Result<()> {
 
         let vec = vec![
             Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5)?,
-//            Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0)?,
+            Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0)?,
         ];
         for y in 0..HEIGHT {
             for x in 0..WIDTH {
