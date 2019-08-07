@@ -1,4 +1,4 @@
-use minifb::{Key, Window, WindowOptions};
+use minifb::{Key, Scale, Window, WindowOptions};
 
 use crate::errors::*;
 use crate::fb::FrameBuffer;
@@ -15,7 +15,10 @@ impl Screen {
             "Test - ESC to exit",
             width,
             height,
-            WindowOptions::default(),
+            WindowOptions {
+                scale: Scale::X2,
+                ..WindowOptions::default()
+            },
         )?;
         Ok(Screen { fb, window })
     }
