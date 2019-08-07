@@ -12,6 +12,7 @@ fn color(ray: &Ray, hit_test: &impl HitTest) -> Color {
         hit_record.normal.y() + 1.0,
         hit_record.normal.z() +1.0)).into();
     } else {
+        // Nothing hit. Use background color (blue-to-white gradient).
         let unit_direction = ray.direction().unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.0);
         (((1.0 - t) * Vec3::new(1.0, 1.0, 1.0)) + (t * Vec3::new(0.5, 0.7, 1.0))).into()

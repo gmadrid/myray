@@ -17,6 +17,50 @@ impl Color {
 
         Ok(Color { r, g, b })
     }
+
+    pub fn from_hex(s: &str) -> Result<Self> {
+        let digits = if s.starts_with('#') {
+            &s[1..]
+        } else {
+            s
+        };
+
+        if digits.chars().any(|ch| !ch.is_digit(16)) {
+            return Err(ErrorKind::ParseError(s.to_string(), "Must contain only hex digits, 0-f".to_string()).into())
+        }
+
+        if digits.len() != 6 {
+            return Err(ErrorKind::ParseError(s.to_string(), "Must have 6 digits.".to_string()).into());
+        }
+
+        // We can split_at since all chars should be ASCII 0-9 or a-f or A-F.
+        let r = u8::from_str_radix(&digits[0..2], 16)?;
+        let g = u8::from_str_radix(&digits[2..4], 16)?;
+        let b = u8::from_str_radix(&digits[4..6], 16)?;
+
+        Color::from_rgb(r, g, b)
+    }
+
+    pub fn from_rgb(r: u8, g: u8, b: u8) -> Result<Self> {
+        Color::new((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) /255.0)
+    }
+
+    // h: [0-360]
+    // s: [0-1]
+    // v: [0-1]
+    pub fn from_hsv(h: f32, s: f32, v: f32) -> Result<Self> {
+        range_check(h, 0.0, 360.0)?;
+        range_check(s, 0.0, 1.0)?;
+        range_check(v, 0.0, 1.0)?;
+
+        let f = |n| {
+            let k = (((n as f32) + h/60.0) as u32) % 6;
+            let min_of_three = (u32::min(k, u32::min(4 - k, 1))) as f32;
+            v - v * s * f32::max(min_of_three, 0.0)
+        };
+
+        Color::new(f(5), f(3), f(1))
+    }
 }
 
 impl From<Color> for u32 {
