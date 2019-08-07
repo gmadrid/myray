@@ -14,7 +14,10 @@ impl Sphere {
         if radius <= 0.0 {
             Err(ErrorKind::InvalidParam(radius, "radius must be > 0.0".into()).into())
         } else {
-            Ok(Sphere{ center: *center, radius })
+            Ok(Sphere {
+                center: *center,
+                radius,
+            })
         }
     }
 }
@@ -26,27 +29,27 @@ impl HitTest for Sphere {
         let b = dot(&oc, ray.direction());
         let c = dot(&oc, &oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
-        if discriminant > 0.0  {
+        if discriminant > 0.0 {
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if temp < t_max && temp > t_min {
                 let point = ray.point_at(temp);
                 let normal = (point - self.center) / self.radius;
-                return Some(HitRecord{
+                return Some(HitRecord {
                     t: temp,
                     point,
                     normal,
-                })
+                });
             }
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if temp < t_max && temp > t_min {
                 // TODO: DRY
                 let point = ray.point_at(temp);
                 let normal = (point - self.center) / self.radius;
-                return Some(HitRecord{
+                return Some(HitRecord {
                     t: temp,
                     point,
                     normal,
-                })
+                });
             }
         }
         return None;

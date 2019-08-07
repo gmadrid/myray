@@ -19,18 +19,20 @@ impl Color {
     }
 
     pub fn from_hex(s: &str) -> Result<Self> {
-        let digits = if s.starts_with('#') {
-            &s[1..]
-        } else {
-            s
-        };
+        let digits = if s.starts_with('#') { &s[1..] } else { s };
 
         if digits.chars().any(|ch| !ch.is_digit(16)) {
-            return Err(ErrorKind::ParseError(s.to_string(), "Must contain only hex digits, 0-f".to_string()).into())
+            return Err(ErrorKind::ParseError(
+                s.to_string(),
+                "Must contain only hex digits, 0-f".to_string(),
+            )
+            .into());
         }
 
         if digits.len() != 6 {
-            return Err(ErrorKind::ParseError(s.to_string(), "Must have 6 digits.".to_string()).into());
+            return Err(
+                ErrorKind::ParseError(s.to_string(), "Must have 6 digits.".to_string()).into(),
+            );
         }
 
         // We can split_at since all chars should be ASCII 0-9 or a-f or A-F.
@@ -42,7 +44,7 @@ impl Color {
     }
 
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Result<Self> {
-        Color::new((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) /255.0)
+        Color::new((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) / 255.0)
     }
 
     // h: [0-360]
@@ -54,13 +56,33 @@ impl Color {
         range_check(v, 0.0, 1.0)?;
 
         let f = |n| {
-            let k = (((n as f32) + h/60.0) as u32) % 6;
-            let min_of_three = (u32::min(k, u32::min(4 - k, 1))) as f32;
+            let k = (((n as f32) + h / 60.0) as i32) % 6;
+            let min_of_three = (i32::min(k, i32::min(4 - k, 1))) as f32;
             v - v * s * f32::max(min_of_three, 0.0)
         };
 
         Color::new(f(5), f(3), f(1))
     }
+
+    pub fn white() -> Self {
+        Color::new(1.0, 1.0, 1.0).unwrap()
+    }
+
+    pub fn black() -> Self {
+        Color::new(0.0, 0.0, 0.0).unwrap()
+    }
+
+    pub fn as_vec(&self) -> Vec3 {
+        Vec3::new(self.r, self.g, self.b)
+    }
+}
+
+pub fn gradient(t: f32, l_color: &Color, r_color: &Color) -> Color {
+    range_check(t, 0.0, 1.0).unwrap();
+
+    let l_vec = (1.0 - t) * l_color.as_vec();
+    let r_vec = t * r_color.as_vec();
+    (l_vec + r_vec).into()
 }
 
 impl From<Color> for u32 {

@@ -26,7 +26,7 @@ pub mod errors {
 }
 
 pub use camera::Camera;
-pub use color::Color;
+pub use color::{gradient, Color};
 pub use hittest::{HitRecord, HitTest};
 pub use ray::Ray;
 pub use screen::Screen;
