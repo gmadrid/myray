@@ -19,11 +19,10 @@ pub mod errors {
 pub use color::Color;
 pub use ray::Ray;
 pub use screen::Screen;
-pub use vec3::Vec3;
+pub use vec3::{dot, Vec3};
 
 mod color;
 mod fb;
 mod ray;
 mod screen;
 mod vec3;
-

@@ -1,8 +1,6 @@
 use std::f32;
 
-use std::ops::Add;
-use std::ops::Mul;
-use std::ops::Div;
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Clone, Copy)]
 pub struct Vec3(f32, f32, f32);
@@ -33,19 +31,47 @@ impl Vec3 {
     }
 }
 
+pub fn dot(a: &Vec3, b: &Vec3) -> f32 {
+    a.0 * b.0 + a.1 * b.1 + a.2 * b.2
+}
+
 impl Add<Vec3> for Vec3 {
     type Output = Self;
-    
+
     fn add(self, rhs: Self) -> Self {
         Vec3::new(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
     }
 }
 
+impl<'a> Sub<&'a Vec3> for &'a Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Vec3::new(self.0 - rhs.0, self.1 - rhs.1, self.2 - rhs.2)
+    }
+}
+
 impl Mul<Vec3> for f32 {
     type Output = Vec3;
-        
+
     fn mul(self, v: Vec3) -> Self::Output {
         Vec3::new(v.0 * self, v.1 * self, v.2 * self)
+    }
+}
+
+impl Mul<f32> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, v: f32) -> Self::Output {
+        v * self
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, v: Vec3) -> Self::Output {
+        Vec3::new(self.0 * v.0, self.1 * v.1, self.2 * v.2)
     }
 }
 

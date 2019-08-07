@@ -1,13 +1,26 @@
-use rays::{Color, Ray, Screen, Vec3};
 use rays::errors::*;
+use rays::{dot, Color, Ray, Screen, Vec3};
 
 const WIDTH: usize = 640;
 const HEIGHT: usize = 480;
 
+fn hit_sphere(center: &Vec3, radius: f32, ray: &Ray) -> bool {
+    let oc = ray.origin() - center;
+    let a = dot(ray.direction(), ray.direction());
+    let b = 2.0 * dot(&oc, ray.direction());
+    let c = dot(&oc, &oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    return discriminant > 0.0;
+}
+
 fn color(ray: &Ray) -> Color {
-    let unit_direction = ray.direction().unit_vector();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    ((1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)).into()
+    if hit_sphere(&Vec3::new(0.0, 0.0, -1.0), 0.5, ray) {
+        Color::new(1.0, 0.0, 0.0).unwrap()
+    } else {
+        let unit_direction = ray.direction().unit_vector();
+        let t = 0.5 * (unit_direction.y() + 1.0);
+        (((1.0 - t) * Vec3::new(1.0, 1.0, 1.0)) * (t * Vec3::new(0.5, 0.7, 1.0))).into()
+    }
 }
 
 fn main() -> Result<()> {
@@ -26,19 +39,9 @@ fn main() -> Result<()> {
             for x in 0..WIDTH {
                 let u = x as f32 / width;
                 let v = y as f32 / height;
-                let r = Ray::new(origin,
-                                 lower_left_corner + u * horiz + v * vert);
+                let r = Ray::new(origin, lower_left_corner + u * horiz + v * vert);
                 let col = color(&r);
                 fb.set(x, y, col);
-                
-
-                
-//                let r = x as f32 / width;
-//                let g = y as f32 / height;
-//                let b = 0.2;
-//
-//                let color = Color::new(r, g, b)?;
-//                fb.set(x, y, color);
             }
         }
         Ok(())

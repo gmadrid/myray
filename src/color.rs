@@ -8,7 +8,7 @@ pub struct Color {
     b: f32,
 }
 
-fn range_check(val: f32, min: f32, max:f32) -> Result<()> {
+fn range_check(val: f32, min: f32, max: f32) -> Result<()> {
     if val < min || val > max {
         Err(ErrorKind::OutOfRange(val, min, max).into())
     } else {
@@ -28,9 +28,9 @@ impl Color {
 
 impl From<Color> for u32 {
     fn from(color: Color) -> Self {
-        (((255.99 * color.r) as u32) << 16) +
-            (((255.99 * color.g) as u32) << 8) +
-            ((255.99 * color.b) as u32)
+        (((255.99 * color.r) as u32) << 16)
+            + (((255.99 * color.g) as u32) << 8)
+            + ((255.99 * color.b) as u32)
     }
 }
 
