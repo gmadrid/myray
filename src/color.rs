@@ -1,4 +1,5 @@
 use crate::errors::*;
+use crate::util::range_check;
 use crate::vec3::Vec3;
 
 pub struct Color {
@@ -6,14 +7,6 @@ pub struct Color {
     r: f32,
     g: f32,
     b: f32,
-}
-
-fn range_check(val: f32, min: f32, max: f32) -> Result<()> {
-    if val < min || val > max {
-        Err(ErrorKind::OutOfRange(val, min, max).into())
-    } else {
-        Ok(())
-    }
 }
 
 impl Color {
