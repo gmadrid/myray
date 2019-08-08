@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate error_chain;
 
+#[macro_use]
+extern crate lazy_static;
+
 pub mod errors {
     error_chain! {
         errors {
@@ -31,14 +34,18 @@ pub use hittest::{HitRecord, HitTest};
 pub use ray::Ray;
 pub use screen::Screen;
 pub use sphere::Sphere;
+pub use unit_random::unit_random;
+pub use util::random_in_unit_sphere;
 pub use vec3::{dot, Vec3};
 
 mod camera;
 mod color;
 mod fb;
 mod hittest;
+mod material;
 mod ray;
 mod screen;
 mod sphere;
+mod unit_random;
 mod util;
 mod vec3;

@@ -22,8 +22,12 @@ impl Vec3 {
         self.2
     }
 
+    pub fn squared_length(&self) -> f32 {
+        self.0 * self.0 + self.1 * self.1 + self.2 * self.2
+    }
+
     pub fn length(&self) -> f32 {
-        f32::sqrt(self.0 * self.0 + self.1 * self.1 + self.2 * self.2)
+        f32::sqrt(self.squared_length())
     }
 
     pub fn unit_vector(&self) -> Vec3 {
