@@ -7,20 +7,20 @@ use crate::vec3::{dot, Vec3};
 pub struct Sphere {
     center: Vec3,
     radius: f32,
-//    material: Box<dyn Material>,
+    //    material: Box<dyn Material>,
 }
 
 impl Sphere {
     // radius must be > 0.0
-    pub fn new/*<M>*/(center: &Vec3, radius: f32) /*, material: M)*/ -> Result<Sphere>
-    /* where M: Material */ {
+    pub fn new(center: &Vec3, radius: f32) -> Result<Sphere>
+/* where M: Material */ {
         if radius <= 0.0 {
             Err(ErrorKind::InvalidParam(radius, "radius must be > 0.0".into()).into())
         } else {
             Ok(Sphere {
                 center: *center,
                 radius,
-//                material: Box::new(material),
+                //                material: Box::new(material),
             })
         }
     }
@@ -42,7 +42,7 @@ impl HitTest for Sphere {
                     t: temp,
                     point,
                     normal,
-//                    material: &self.material,
+                    //                    material: &self.material,
                 });
             }
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
@@ -54,7 +54,7 @@ impl HitTest for Sphere {
                     t: temp,
                     point,
                     normal,
-//                    material: &self.material,
+                    //                    material: &self.material,
                 });
             }
         }

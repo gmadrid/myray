@@ -2,11 +2,11 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
-pub struct HitRecord/*<'a>*/ {
+pub struct HitRecord /*<'a>*/ {
     pub t: f32,
     pub point: Vec3,
     pub normal: Vec3,
-//    pub material: &'a Material,
+    //    pub material: &'a Material,
 }
 
 pub trait HitTest {
@@ -28,5 +28,4 @@ where
         }
         hit_record
     }
-
 }

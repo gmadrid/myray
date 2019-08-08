@@ -1,4 +1,7 @@
 #[macro_use]
+extern crate clap;
+
+#[macro_use]
 extern crate error_chain;
 
 #[macro_use]
@@ -21,6 +24,7 @@ pub mod errors {
             }
         }
         foreign_links {
+            ClapError(clap::Error);
             MiniFBError(minifb::Error);
             ParseIntError(std::num::ParseIntError);
         }
@@ -28,6 +32,7 @@ pub mod errors {
 
 }
 
+pub use args::Config;
 pub use camera::Camera;
 pub use color::{gradient, Color};
 pub use hittest::{HitRecord, HitTest};
@@ -38,6 +43,7 @@ pub use unit_random::unit_random;
 pub use util::random_in_unit_sphere;
 pub use vec3::{dot, Vec3};
 
+mod args;
 mod camera;
 mod color;
 mod fb;
