@@ -43,15 +43,15 @@ impl_op_ex!(+ |lhs: &Vec3, rhs: &Vec3| -> Vec3 {
     Vec3::new(lhs.0 + rhs.0, lhs.1 + rhs.1, lhs.2 + rhs.2)
 });
 
-impl_op_ex!(- |lhs: &Vec3, rhs: &Vec3| -> Vec3 {
+impl_op_ex!(-|lhs: &Vec3, rhs: &Vec3| -> Vec3 {
     Vec3::new(lhs.0 - rhs.0, lhs.1 - rhs.1, lhs.2 - rhs.2)
 });
 
-impl_op_ex_commutative!(* |lhs: f32, rhs: &Vec3| -> Vec3 {
+impl_op_ex_commutative!(*|lhs: f32, rhs: &Vec3| -> Vec3 {
     Vec3::new(lhs * rhs.0, lhs * rhs.1, lhs * rhs.2)
 });
 
-impl_op_ex!(* |lhs: &Vec3, rhs: &Vec3| -> Vec3 {
+impl_op_ex!(*|lhs: &Vec3, rhs: &Vec3| -> Vec3 {
     Vec3::new(lhs.0 * rhs.0, lhs.1 * rhs.1, lhs.2 * rhs.2)
 });
 
