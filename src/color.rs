@@ -72,6 +72,14 @@ impl Color {
         Color::new(0.0, 0.0, 0.0).unwrap()
     }
 
+    pub fn red() -> Self {
+        Color::new(1.0, 0.0, 0.0).unwrap()
+    }
+
+    pub fn blue() -> Self {
+        Color::new(0.0, 0.0, 1.0).unwrap()
+    }
+
     pub fn as_vec(&self) -> Vec3 {
         Vec3::new(self.r, self.g, self.b)
     }

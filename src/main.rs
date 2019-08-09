@@ -6,28 +6,20 @@ use rays::errors::*;
 use rays::Config;
 use rays::{gradient, Camera, Color, HitTest, Ray, Screen, Sphere, Vec3};
 use rays::{random_in_unit_sphere, unit_random};
+use rays::{Lambertian, Material};
 
 const BACKGROUND_HUE: f32 = 205.0;
 
-fn color(ray: &Ray, hit_test: &impl HitTest /*, depth: usize*/) -> Color {
+fn color(ray: &Ray, hit_test: &impl HitTest , depth: usize) -> Color {
     if let Some(hit_record) = hit_test.hit_test(ray, 0.001, f32::MAX) {
-        //        if depth >= 50 {
-        //            return Color::black();
-        //        }
-
-        /*        if let Some((attenuation, scattered)) = hit_record.material.scatter(ray, hit_record) {
-            return Color::from(attenuation * color(scattered, hit_test, depth + 1).as_vec());
+        if depth >= 50 {
+            return Color::black();
         }
-        return Color::black();*/
 
-        let target = hit_record.point + hit_record.normal + random_in_unit_sphere();
-        return Color::from(
-            0.5 * color(
-                &Ray::new(hit_record.point, target - hit_record.point),
-                hit_test,
-            )
-            .as_vec(),
-        );
+        if let Some((scattered, attenuation)) = hit_record.material.scatter(ray, &hit_record) {
+            return Color::from(attenuation * color(&scattered, hit_test, depth + 1).as_vec());
+        }
+        return Color::black();
     } else {
         let unit_direction = ray.direction().unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.0);
@@ -48,8 +40,16 @@ fn path_trace(config: &Config) -> Result<()> {
         let width = fb.width() as f32;
 
         let vec = vec![
-            Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5)?,
-            Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0)?,
+            Sphere::new(
+                &Vec3::new(0.0, 0.0, -1.0),
+                0.5,
+                Lambertian::new(Color::red()),
+            )?,
+            Sphere::new(
+                &Vec3::new(0.0, -100.5, -1.0),
+                100.0,
+                Lambertian::new(Color::blue()),
+            )?,
         ];
 
         let pb = ProgressBar::new((height * width) as u64);
@@ -62,7 +62,7 @@ fn path_trace(config: &Config) -> Result<()> {
                     let u = (x as f32 + unit_random()) / width;
                     let v = (y as f32 + unit_random()) / height;
                     let ray = camera.get_ray(u, v);
-                    color_vec = color_vec + color(&ray, &vec /*, 0*/).as_vec();
+                    color_vec = color_vec + color(&ray, &vec, 0).as_vec();
                 }
 
                 fb.set(x, y, Color::from(color_vec / config.num_samples as f32));

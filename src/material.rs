@@ -1,4 +1,4 @@
-/*
+use crate::color::Color;
 use crate::hittest::HitRecord;
 use crate::ray::Ray;
 use crate::util::random_in_unit_sphere;
@@ -13,8 +13,10 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    pub fn new(albedo: Vec3) -> Self {
-        Lambertian { albedo }
+    pub fn new(albedo: Color) -> Self {
+        Lambertian {
+            albedo: albedo.as_vec(),
+        }
     }
 }
 
@@ -25,4 +27,3 @@ impl Material for Lambertian {
         Some((scattered, self.albedo))
     }
 }
-*/
