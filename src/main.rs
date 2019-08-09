@@ -3,14 +3,14 @@ use std::f32;
 use indicatif::ProgressBar;
 
 use rays::errors::*;
+use rays::unit_random;
 use rays::Config;
-use rays::{gradient, Camera, Color, HitTest, Ray, Screen, Sphere, Vec3};
-use rays::{unit_random};
 use rays::Lambertian;
+use rays::{gradient, Camera, Color, HitTest, Ray, Screen, Sphere, Vec3};
 
 const BACKGROUND_HUE: f32 = 205.0;
 
-fn color(ray: &Ray, hit_test: &impl HitTest , depth: usize) -> Color {
+fn color(ray: &Ray, hit_test: &impl HitTest, depth: usize) -> Color {
     if let Some(hit_record) = hit_test.hit_test(ray, 0.001, f32::MAX) {
         if depth >= 50 {
             return Color::black();
