@@ -5,8 +5,8 @@ use indicatif::ProgressBar;
 use rays::errors::*;
 use rays::Config;
 use rays::{gradient, Camera, Color, HitTest, Ray, Screen, Sphere, Vec3};
-use rays::{random_in_unit_sphere, unit_random};
-use rays::{Lambertian, Material};
+use rays::{unit_random};
+use rays::Lambertian;
 
 const BACKGROUND_HUE: f32 = 205.0;
 
