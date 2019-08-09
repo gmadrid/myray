@@ -78,7 +78,7 @@ fn path_trace(config: &Config) -> Result<()> {
 }
 
 fn real_main() -> Result<()> {
-    let config = Config::new()?;    
+    let config = Config::new()?;
     path_trace(&config)
 }
 

@@ -27,6 +27,10 @@ impl Screen {
     where
         F: FnMut(&mut FrameBuffer) -> Result<()>,
     {
+        // Workaround the Mac black window by showing a window immediately.
+        #[cfg(target_os = "macos")]
+        self.window.update_with_buffer(&self.fb.buffer())?;
+
         f(&mut self.fb)?;
         self.window.update_with_buffer(&self.fb.buffer())?;
         Ok(())
