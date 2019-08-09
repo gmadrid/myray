@@ -3,10 +3,10 @@ use std::f32;
 use indicatif::ProgressBar;
 
 use rays::errors::*;
-use rays::unit_random;
-use rays::Config;
-use rays::Lambertian;
-use rays::{gradient, Camera, Color, HitTest, Metal, Ray, Screen, Sphere, Vec3};
+use rays::{
+    gradient, unit_random, Camera, Color, Config, Dielectric, HitTest, Lambertian, Metal, Ray,
+    Screen, Sphere, Vec3,
+};
 
 const BACKGROUND_HUE: f32 = 205.0;
 
@@ -55,11 +55,7 @@ fn path_trace(config: &Config) -> Result<()> {
                 0.5,
                 Metal::new(Color::new(0.8, 0.6, 0.2)?),
             )?,
-            Sphere::new(
-                &Vec3::new(-1.0, 0.0, -1.0),
-                0.5,
-                Metal::new(Color::new(0.8, 0.8, 0.8)?),
-            )?,
+            Sphere::new(&Vec3::new(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
         ];
 
         let pb = ProgressBar::new((height * width) as u64);

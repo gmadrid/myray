@@ -1,6 +1,7 @@
 use crate::color::Color;
 use crate::hittest::HitRecord;
 use crate::ray::Ray;
+use crate::unit_random::unit_random;
 use crate::util::random_in_unit_sphere;
 use crate::vec3::{dot, Vec3};
 
@@ -54,5 +55,76 @@ impl Material for Metal {
         } else {
             None
         }
+    }
+}
+
+pub struct Dielectric {
+    refractive_index: f32,
+}
+
+impl Dielectric {
+    pub fn new(refractive_index: f32) -> Dielectric {
+        Dielectric { refractive_index }
+    }
+}
+
+fn refract(vec: &Vec3, normal: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
+    let uv = vec.unit_vector();
+    let dt = dot(&uv, normal);
+    let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
+    if discriminant > 0.0 {
+        Some(ni_over_nt * (uv - normal * dt) - normal * f32::sqrt(discriminant))
+    } else {
+        None
+    }
+}
+
+fn schlick(cosine: f32, ref_idx: f32) -> f32 {
+    let r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
+    let r0sq = r0 * r0;
+    r0sq + (1.0 - r0sq) * f32::powi(1.0 - cosine, 5)
+}
+
+impl Material for Dielectric {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
+        let dotp = dot(ray.direction(), &hit_record.normal);
+        let (outward_normal, ni_over_nt, cosine) = if dotp > 0.0 {
+            // TODO: make unary minus work
+            (
+                Vec3::new(0.0, 0.0, 0.0) - hit_record.normal,
+                self.refractive_index,
+                self.refractive_index * dotp / ray.direction().length(),
+            )
+        } else {
+            (
+                hit_record.normal,
+                1.0 / self.refractive_index,
+                -dotp / ray.direction().length(),
+            )
+        };
+
+        let mut refracted = None;
+        let reflect_prob =
+            if let Some(refracted_val) = refract(ray.direction(), &outward_normal, ni_over_nt) {
+                refracted = Some(refracted_val);
+                schlick(cosine, self.refractive_index)
+            } else {
+                1.0
+            };
+
+        let scattered = if unit_random() < reflect_prob {
+            Ray::new(
+                hit_record.point,
+                reflect(ray.direction(), &hit_record.normal),
+            )
+        } else {
+            // refracted will always take the other path when it == None because the
+            // reflect_prob will == 1.0
+            // TODO: make this code more clear and less prone to problems.
+            Ray::new(hit_record.point, refracted.unwrap())
+        };
+
+        let attenuation = Vec3::new(1.0, 1.0, 1.0);
+        Some((scattered, attenuation))
     }
 }

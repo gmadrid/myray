@@ -39,7 +39,7 @@ pub use args::Config;
 pub use camera::Camera;
 pub use color::{gradient, Color};
 pub use hittest::{HitRecord, HitTest};
-pub use material::{Lambertian, Material, Metal};
+pub use material::{Dielectric, Lambertian, Material, Metal};
 pub use ray::Ray;
 pub use screen::Screen;
 pub use sphere::Sphere;
