@@ -1,5 +1,7 @@
 use std::f32;
 
+use indicatif::ProgressBar;
+
 use rays::errors::*;
 use rays::Config;
 use rays::{gradient, Camera, Color, HitTest, Ray, Screen, Sphere, Vec3};
@@ -49,14 +51,12 @@ fn path_trace(config: &Config) -> Result<()> {
             Sphere::new(&Vec3::new(0.0, 0.0, -1.0), 0.5)?,
             Sphere::new(&Vec3::new(0.0, -100.5, -1.0), 100.0)?,
         ];
-        let total_iters = (height * width) as f32;
-        let mut count = 0;
 
-        println!("");
+        let pb = ProgressBar::new((height * width) as u64);
+
         for y in 0..config.screen_height {
             for x in 0..config.screen_width {
-                print!("\r{:.2}%", (count * 100) as f32 / total_iters);
-                count += 1;
+                pb.inc(1);
                 let mut color_vec = Vec3::new(0.0, 0.0, 0.0);
                 for _ in 0..config.num_samples {
                     let u = (x as f32 + unit_random()) / width;
@@ -68,7 +68,7 @@ fn path_trace(config: &Config) -> Result<()> {
                 fb.set(x, y, Color::from(color_vec / config.num_samples as f32));
             }
         }
-        print!("\r                \n");
+        pb.finish_and_clear();
         Ok(())
     })?;
 
