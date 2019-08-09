@@ -30,7 +30,7 @@ impl Sphere {
 
 impl HitTest for Sphere {
     fn hit_test(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
-        let oc = *ray.origin() - self.center;
+        let oc = ray.origin() - self.center;
         let a = dot(ray.direction(), ray.direction());
         let b = dot(&oc, ray.direction());
         let c = dot(&oc, &oc) - self.radius * self.radius;

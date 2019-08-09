@@ -41,7 +41,7 @@ impl Metal {
 }
 
 fn reflect(vec: &Vec3, normal: &Vec3) -> Vec3 {
-    *vec - 2.0 * dot(vec, normal) * *normal
+    vec - 2.0 * dot(vec, normal) * normal
 }
 
 impl Material for Metal {

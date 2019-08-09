@@ -5,6 +5,9 @@ extern crate clap;
 extern crate error_chain;
 
 #[macro_use]
+extern crate impl_ops;
+
+#[macro_use]
 extern crate lazy_static;
 
 pub mod errors {
