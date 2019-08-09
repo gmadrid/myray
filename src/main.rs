@@ -6,7 +6,7 @@ use rays::errors::*;
 use rays::unit_random;
 use rays::Config;
 use rays::Lambertian;
-use rays::{gradient, Camera, Color, HitTest, Ray, Screen, Sphere, Vec3};
+use rays::{gradient, Camera, Color, HitTest, Metal, Ray, Screen, Sphere, Vec3};
 
 const BACKGROUND_HUE: f32 = 205.0;
 
@@ -43,12 +43,22 @@ fn path_trace(config: &Config) -> Result<()> {
             Sphere::new(
                 &Vec3::new(0.0, 0.0, -1.0),
                 0.5,
-                Lambertian::new(Color::red()),
+                Lambertian::new(Color::new(0.8, 0.3, 0.3)?),
             )?,
             Sphere::new(
                 &Vec3::new(0.0, -100.5, -1.0),
                 100.0,
-                Lambertian::new(Color::blue()),
+                Lambertian::new(Color::new(0.8, 0.8, 0.0)?),
+            )?,
+            Sphere::new(
+                &Vec3::new(1.0, 0.0, -1.0),
+                0.5,
+                Metal::new(Color::new(0.8, 0.6, 0.2)?),
+            )?,
+            Sphere::new(
+                &Vec3::new(-1.0, 0.0, -1.0),
+                0.5,
+                Metal::new(Color::new(0.8, 0.8, 0.8)?),
             )?,
         ];
 
