@@ -38,7 +38,7 @@ fn color(ray: &Ray, hit_test: &impl HitTest /*, depth: usize*/) -> Color {
 }
 
 fn path_trace(config: &Config) -> Result<()> {
-    let mut screen = Screen::new(config.screen_width, config.screen_height).unwrap();
+    let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     let camera = Camera::new()?;
 
     screen.one_frame(|fb| {

@@ -9,14 +9,14 @@ pub struct Screen {
 }
 
 impl Screen {
-    pub fn new(width: usize, height: usize) -> Result<Self> {
+    pub fn new(width: usize, height: usize, scale: Scale) -> Result<Self> {
         let fb = FrameBuffer::new(width, height)?;
         let window = Window::new(
             "Test - ESC to exit",
             width,
             height,
             WindowOptions {
-                //                scale: Scale::X4,
+                scale: scale,
                 ..WindowOptions::default()
             },
         )?;
