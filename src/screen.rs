@@ -36,9 +36,9 @@ impl Screen {
         Ok(())
     }
 
-    pub fn wait(&self) -> Result<()> {
+    pub fn wait(&mut self) -> Result<()> {
         while self.window.is_open() && !self.window.is_key_down(Key::Escape) {
-            // Find some better way to do this without hard-looping.
+            self.window.update();
         }
         Ok(())
     }
