@@ -2,7 +2,7 @@ use crate::color::Color;
 use crate::hittest::HitRecord;
 use crate::ray::Ray;
 use crate::unit_random::unit_random;
-use crate::util::random_in_unit_sphere;
+use crate::util::{if_then, random_in_unit_sphere};
 use crate::vec3::{dot, Vec3};
 
 pub trait Material {
@@ -50,11 +50,9 @@ impl Material for Metal {
         let reflected = reflect(&ray.direction().unit_vector(), &hit_record.normal);
         let scattered = Ray::new(hit_record.point, reflected);
         let attenuation = self.albedo;
-        if dot(scattered.direction(), &hit_record.normal) > 0.0 {
+        if_then(dot(scattered.direction(), &hit_record.normal) > 0.0, || {
             Some((scattered, attenuation))
-        } else {
-            None
-        }
+        })
     }
 }
 
@@ -72,11 +70,9 @@ fn refract(vec: &Vec3, normal: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
     let uv = vec.unit_vector();
     let dt = dot(&uv, normal);
     let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
-    if discriminant > 0.0 {
+    if_then(discriminant > 0.0, || {
         Some(ni_over_nt * (uv - normal * dt) - normal * f32::sqrt(discriminant))
-    } else {
-        None
-    }
+    })
 }
 
 fn schlick(cosine: f32, ref_idx: f32) -> f32 {

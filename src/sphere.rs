@@ -39,7 +39,7 @@ impl HitTest for Sphere {
 
         let check_hit = |sign| {
             let t = (-b + sign * f32::sqrt(discriminant)) / a;
-            if t < t_max && t > t_min {
+            if_then(t < t_max && t > t_min, || {
                 let point = ray.point_at(t);
                 let normal = (point - self.center) / self.radius;
                 Some(HitRecord {
@@ -48,9 +48,7 @@ impl HitTest for Sphere {
                     normal,
                     material: self.material.as_ref(),
                 })
-            } else {
-                None
-            }
+            })
         };
 
         if_then(discriminant > 0.0, || {
