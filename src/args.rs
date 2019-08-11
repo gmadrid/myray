@@ -8,12 +8,14 @@ use minifb::Scale;
 
 use crate::errors::*;
 
-const SCREEN_WIDTH: (&str, usize) = ("screen_width", 320);
-const SCREEN_HEIGHT: (&str, usize) = ("screen_height", 240);
+const MAX_DEPTH: (&str, usize) = ("max_depth", 50);
 const NUM_SAMPLES: (&str, usize) = ("num_samples", 5);
 const SCALE: (&str, usize) = ("scale", 1);
+const SCREEN_HEIGHT: (&str, usize) = ("screen_height", 240);
+const SCREEN_WIDTH: (&str, usize) = ("screen_width", 320);
 
 pub struct Config {
+    pub max_depth: usize,
     pub scale: Scale,
 
     pub screen_width: usize,
@@ -33,6 +35,7 @@ impl<'a> TryFrom<Args<'a>> for Config {
 
     fn try_from(args: Args<'a>) -> Result<Self> {
         Ok(Config {
+            max_depth: args.value_or_default(MAX_DEPTH)?,
             scale: args.value_or_default(SCALE).and_then(num_to_scale)?,
             screen_width: args.value_or_default(SCREEN_WIDTH)?,
             screen_height: args.value_or_default(SCREEN_HEIGHT)?,
@@ -121,6 +124,13 @@ where
                 .visible_alias("sc")
                 .help("Scale for the output window.")
                 .long_help("Scale the output window. Valid values are 0 (fit to screen), 1, 2, 4, 8, 16, & 32.")
+        )
+        .arg(
+            Arg::with_name(MAX_DEPTH.0)
+                .long(MAX_DEPTH.0)
+                .takes_value(true)
+                .visible_alias("md")
+                .help("Max depth for scattered rays.")
         )
         .get_matches_from_safe(itr)
         .map_err(Error::from)

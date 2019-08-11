@@ -23,6 +23,14 @@ impl Screen {
         Ok(Screen { fb, window })
     }
 
+    pub fn height(&self) -> usize {
+        self.fb.height()
+    }
+
+    pub fn width(&self) -> usize {
+        self.fb.width()
+    }
+
     pub fn one_frame<F>(&mut self, mut f: F) -> Result<()>
     where
         F: FnMut(&mut FrameBuffer) -> Result<()>,

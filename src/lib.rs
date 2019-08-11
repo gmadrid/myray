@@ -30,6 +30,7 @@ pub mod errors {
             ClapError(clap::Error);
             MiniFBError(minifb::Error);
             ParseIntError(std::num::ParseIntError);
+            ParseFloatError(std::num::ParseFloatError);
         }
     }
 
