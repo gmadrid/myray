@@ -43,6 +43,8 @@ impl_op_ex!(+ |lhs: &Vec3, rhs: &Vec3| -> Vec3 {
     Vec3::new(lhs.0 + rhs.0, lhs.1 + rhs.1, lhs.2 + rhs.2)
 });
 
+impl_op_ex!(-|val: &Vec3| -> Vec3 { Vec3::new(-val.0, -val.1, -val.2) });
+
 impl_op_ex!(-|lhs: &Vec3, rhs: &Vec3| -> Vec3 {
     Vec3::new(lhs.0 - rhs.0, lhs.1 - rhs.1, lhs.2 - rhs.2)
 });

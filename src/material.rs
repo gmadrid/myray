@@ -85,9 +85,8 @@ impl Material for Dielectric {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
         let dotp = dot(ray.direction(), &hit_record.normal);
         let (outward_normal, ni_over_nt, cosine) = if dotp > 0.0 {
-            // TODO: make unary minus work
             (
-                Vec3::new(0.0, 0.0, 0.0) - hit_record.normal,
+                -hit_record.normal,
                 self.refractive_index,
                 self.refractive_index * dotp / ray.direction().length(),
             )
