@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use std::env;
 use std::ffi::OsString;
 use std::str::FromStr;
@@ -17,37 +18,39 @@ pub struct Config {
 
     pub screen_width: usize,
     pub screen_height: usize,
-
+    
     pub num_samples: usize,
 }
 
 impl Config {
     pub fn new() -> Result<Config> {
-        Ok(Args::parse()?.into())
+        Args::parse().and_then(Config::try_from)
     }
 }
 
-impl<'a> From<Args<'a>> for Config {
-    fn from(args: Args) -> Self {
-        Config {
-            scale: num_to_scale(args.value_or_default(SCALE)),
-            screen_width: args.value_or_default(SCREEN_WIDTH),
-            screen_height: args.value_or_default(SCREEN_HEIGHT),
-            num_samples: args.value_or_default(NUM_SAMPLES),
-        }
+impl<'a> TryFrom<Args<'a>> for Config {
+    type Error = Error;
+
+    fn try_from(args: Args<'a>) -> Result<Self> {
+        Ok(Config {
+            scale: args.value_or_default(SCALE).and_then(num_to_scale)?,
+            screen_width: args.value_or_default(SCREEN_WIDTH)?,
+            screen_height: args.value_or_default(SCREEN_HEIGHT)?,
+            num_samples: args.value_or_default(NUM_SAMPLES)?,
+        })
     }
 }
 
-fn num_to_scale(num: usize) -> Scale {
-    // TODO: Again, shouldn't fail silently.
+fn num_to_scale(num: usize) -> Result<Scale> {
     match num {
-        0 => Scale::FitScreen,
-        2 => Scale::X2,
-        4 => Scale::X4,
-        8 => Scale::X8,
-        16 => Scale::X16,
-        32 => Scale::X32,
-        1 | _ => Scale::X1,
+        0 => Ok(Scale::FitScreen),
+        1 => Ok(Scale::X1),
+        2 => Ok(Scale::X2),
+        4 => Ok(Scale::X4),
+        8 => Ok(Scale::X8),
+        16 => Ok(Scale::X16),
+        32 => Ok(Scale::X32),
+        _ => Err(ErrorKind::InvalidParam(num as f32, "Only 0, 1, 2, 4, 8, 16, & 32 are permitted for scale.".to_string()).into()),
     }
 }
 
@@ -62,11 +65,13 @@ impl<'a> Args<'a> {
         })
     }
 
-    fn value_or_default(&self, desc: (&str, usize)) -> usize {
-        // TODO: this needs to fail on a bad parse, not fall back silently.
-        self.matches
-            .value_of_lossy(desc.0)
-            .map_or(desc.1, |s| usize::from_str(&s).unwrap_or(desc.1))
+    fn value_or_default(&self, desc: (&str, usize)) -> Result<usize> {
+        match self.matches.value_of_lossy(desc.0) {
+            // If there is no match, then use the default.
+            None => Ok(desc.1),
+            // Otherwise, parse it and return any parse errors.
+            Some(s) => Ok(usize::from_str(&s)?)
+        }
     }
 }
 
