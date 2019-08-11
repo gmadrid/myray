@@ -35,31 +35,27 @@ impl HitTest for Sphere {
         let b = dot(&oc, ray.direction());
         let c = dot(&oc, &oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
+
+        let check_hit = |sign| {
+            let t = (-b + sign * f32::sqrt(discriminant)) / a;
+            if t < t_max && t > t_min {
+                let point = ray.point_at(t);
+                let normal = (point - self.center) / self.radius;
+                Some(HitRecord {
+                    t,
+                    point,
+                    normal,
+                    material: self.material.as_ref(),
+                })
+            } else {
+                None
+            }
+        };
+
         if discriminant > 0.0 {
-            let temp = (-b - f32::sqrt(b * b - a * c)) / a;
-            if temp < t_max && temp > t_min {
-                let point = ray.point_at(temp);
-                let normal = (point - self.center) / self.radius;
-                return Some(HitRecord {
-                    t: temp,
-                    point,
-                    normal,
-                    material: self.material.as_ref(),
-                });
-            }
-            let temp = (-b + f32::sqrt(b * b - a * c)) / a;
-            if temp < t_max && temp > t_min {
-                // TODO: DRY
-                let point = ray.point_at(temp);
-                let normal = (point - self.center) / self.radius;
-                return Some(HitRecord {
-                    t: temp,
-                    point,
-                    normal,
-                    material: self.material.as_ref(),
-                });
-            }
+            check_hit(-1.0).or_else(|| check_hit(1.0))
+        } else {
+            None
         }
-        return None;
     }
 }

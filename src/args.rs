@@ -18,7 +18,7 @@ pub struct Config {
 
     pub screen_width: usize,
     pub screen_height: usize,
-    
+
     pub num_samples: usize,
 }
 
@@ -50,7 +50,11 @@ fn num_to_scale(num: usize) -> Result<Scale> {
         8 => Ok(Scale::X8),
         16 => Ok(Scale::X16),
         32 => Ok(Scale::X32),
-        _ => Err(ErrorKind::InvalidParam(num as f32, "Only 0, 1, 2, 4, 8, 16, & 32 are permitted for scale.".to_string()).into()),
+        _ => Err(ErrorKind::InvalidParam(
+            num as f32,
+            "Only 0, 1, 2, 4, 8, 16, & 32 are permitted for scale.".to_string(),
+        )
+        .into()),
     }
 }
 
@@ -70,7 +74,7 @@ impl<'a> Args<'a> {
             // If there is no match, then use the default.
             None => Ok(desc.1),
             // Otherwise, parse it and return any parse errors.
-            Some(s) => Ok(usize::from_str(&s)?)
+            Some(s) => Ok(usize::from_str(&s)?),
         }
     }
 }
