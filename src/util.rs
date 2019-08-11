@@ -19,3 +19,14 @@ pub fn random_in_unit_sphere() -> Vec3 {
         }
     }
 }
+
+pub fn if_then<F, T>(cond: bool, f: F) -> Option<T>
+where
+    F: FnOnce() -> Option<T>,
+{
+    if cond {
+        f()
+    } else {
+        None
+    }
+}

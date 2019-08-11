@@ -2,6 +2,7 @@ use crate::errors::*;
 use crate::hittest::{HitRecord, HitTest};
 use crate::material::Material;
 use crate::ray::Ray;
+use crate::util::if_then;
 use crate::vec3::{dot, Vec3};
 
 pub struct Sphere {
@@ -52,10 +53,8 @@ impl HitTest for Sphere {
             }
         };
 
-        if discriminant > 0.0 {
+        if_then(discriminant > 0.0, || {
             check_hit(-1.0).or_else(|| check_hit(1.0))
-        } else {
-            None
-        }
+        })
     }
 }
