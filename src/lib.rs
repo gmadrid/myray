@@ -14,8 +14,12 @@ pub mod errors {
     error_chain! {
         errors {
             InvalidParam(val: f32, t: String) {
-               description("Value invalid")
-               display("Value invalid ({}): {}", t, val)
+                description("Value invalid")
+                display("Value invalid ({}): {}", t, val)
+            }
+            MissingParam(val: String) {
+                description("Missing command line argument.")
+                display("'{}' must be specified (or have a default", val)
             }
             OutOfRange(val: f32, min: f32, max: f32) {
                 description("Value out of range.")

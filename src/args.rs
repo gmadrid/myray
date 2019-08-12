@@ -8,11 +8,11 @@ use minifb::Scale;
 
 use crate::errors::*;
 
-const MAX_DEPTH: (&str, usize) = ("max_depth", 50);
-const NUM_SAMPLES: (&str, usize) = ("num_samples", 5);
-const SCALE: (&str, usize) = ("scale", 1);
-const SCREEN_HEIGHT: (&str, usize) = ("screen_height", 240);
-const SCREEN_WIDTH: (&str, usize) = ("screen_width", 320);
+const MAX_DEPTH: (&str, &str) = ("max_depth", "50");
+const NUM_SAMPLES: (&str, &str) = ("num_samples", "5");
+const SCALE: (&str, &str) = ("scale", "1");
+const SCREEN_HEIGHT: (&str, &str) = ("screen_height", "240");
+const SCREEN_WIDTH: (&str, &str) = ("screen_width", "320");
 
 pub struct Config {
     pub max_depth: usize,
@@ -35,11 +35,11 @@ impl<'a> TryFrom<Args<'a>> for Config {
 
     fn try_from(args: Args<'a>) -> Result<Self> {
         Ok(Config {
-            max_depth: args.value_or_default(MAX_DEPTH)?,
-            scale: args.value_or_default(SCALE).and_then(num_to_scale)?,
-            screen_width: args.value_or_default(SCREEN_WIDTH)?,
-            screen_height: args.value_or_default(SCREEN_HEIGHT)?,
-            num_samples: args.value_or_default(NUM_SAMPLES)?,
+            max_depth: args.parsed_value(MAX_DEPTH)?,
+            scale: args.parsed_value(SCALE).and_then(num_to_scale)?,
+            screen_width: args.parsed_value(SCREEN_WIDTH)?,
+            screen_height: args.parsed_value(SCREEN_HEIGHT)?,
+            num_samples: args.parsed_value(NUM_SAMPLES)?,
         })
     }
 }
@@ -72,13 +72,11 @@ impl<'a> Args<'a> {
         })
     }
 
-    fn value_or_default(&self, desc: (&str, usize)) -> Result<usize> {
-        match self.matches.value_of_lossy(desc.0) {
-            // If there is no match, then use the default.
-            None => Ok(desc.1),
-            // Otherwise, parse it and return any parse errors.
-            Some(s) => Ok(usize::from_str(&s)?),
-        }
+    fn parsed_value(&self, desc: (&str, &str)) -> Result<usize> {
+        self.matches
+            .value_of_lossy(desc.0)
+            .ok_or_else(|| ErrorKind::MissingParam(desc.0.to_string()).into())
+            .and_then(|cow| Ok(usize::from_str(&cow)?))
     }
 }
 
@@ -96,6 +94,7 @@ where
         .arg(
             Arg::with_name(SCREEN_WIDTH.0)
                 .long(SCREEN_WIDTH.0)
+                .default_value(SCREEN_WIDTH.1)
                 .short("w")
                 .visible_alias("sw")
                 .takes_value(true)
@@ -104,6 +103,7 @@ where
         .arg(
             Arg::with_name(SCREEN_HEIGHT.0)
                 .long(SCREEN_HEIGHT.0)
+                .default_value(SCREEN_HEIGHT.1)
                 .short("h")
                 .visible_alias("sh")
                 .takes_value(true)
@@ -112,6 +112,7 @@ where
         .arg(
             Arg::with_name(NUM_SAMPLES.0)
                 .long(NUM_SAMPLES.0)
+                .default_value(NUM_SAMPLES.1)
                 .short("n")
                 .visible_alias("ns")
                 .takes_value(true)
@@ -120,6 +121,7 @@ where
         .arg(
             Arg::with_name(SCALE.0)
                 .long(SCALE.0)
+                .default_value(SCALE.1)
                 .takes_value(true)
                 .visible_alias("sc")
                 .help("Scale for the output window.")
@@ -128,6 +130,7 @@ where
         .arg(
             Arg::with_name(MAX_DEPTH.0)
                 .long(MAX_DEPTH.0)
+                .default_value(MAX_DEPTH.1)
                 .takes_value(true)
                 .visible_alias("md")
                 .help("Max depth for scattered rays.")
