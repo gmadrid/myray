@@ -33,6 +33,40 @@ fn color(ray: &Ray, hit_test: &impl HitTest, depth: usize, max_depth: usize) -> 
     }
 }
 
+fn random_scene() -> Result<Vec<Sphere>> {
+    let mut world = Vec::new();
+
+    world.push(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0,
+                           Lambertian::new(Color::new(0.5, 0.5, 0.5)?))?);
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = unit_random();
+            let center = Vec3::new(a as f32 + 0.9 * unit_random(), 0.2, b as f32 + 0.9 + unit_random());
+            if (center-Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 { // diffuse
+                    world.push(Sphere::new(&center, 0.2,
+                                           Lambertian::new(Color::new(unit_random() * unit_random(),
+                                                                      unit_random() * unit_random(),
+                                                                      unit_random() * unit_random())?))?);
+                } else if choose_mat < 0.95 {
+                    world.push(Sphere::new(&center, 0.2,
+                                           Metal::new(Color::new(0.5 * (1.0 + unit_random()),
+                                                                 0.5 * (1.0 + unit_random()),
+                                                                 0.5 * (1.0 + unit_random()))?))?);
+                }
+                
+            }
+        }
+    }
+
+    world.push(Sphere::new(&Vec3::new(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5))?);
+    world.push(Sphere::new(&Vec3::new(-4.0, 1.0, 0.0), 1.0, Lambertian::new(Color::new(0.4, 0.2, 0.1)?))?);
+    world.push(Sphere::new(&Vec3::new(4.0, 1.0, 0.0), 1.0, Metal::new(Color::new(0.7, 0.6, 0.5)?))?);
+
+    Ok(world)
+}
+
 fn path_trace(config: &Config) -> Result<()> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     let camera = Camera::new()?;
@@ -47,26 +81,27 @@ fn path_trace(config: &Config) -> Result<()> {
         let width = fb.width() as f32;
 
         //        let r = f32::cos(std::f32::consts::PI / 4.0);
-        let vec = vec![
-            Sphere::new(
-                &Vec3::new(0.0, 0.0, -1.0),
-                0.5,
-                Lambertian::new(Color::new(0.8, 0.3, 0.3)?),
-            )?,
-            Sphere::new(
-                &Vec3::new(0.0, -100.5, -1.0),
-                100.0,
-                Lambertian::new(Color::new(0.3, 0.3, 0.8)?),
-            )?,
-            Sphere::new(
-                &Vec3::new(1.0, 0.0, -1.0),
-                0.5,
-                Metal::new(Color::new(0.8, 0.6, 0.2)?),
-            )?,
-            Sphere::new(&Vec3::new(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
-            // Sphere::new(&Vec3::new(-r, 0.0, -1.0), r, Lambertian::new(Color::blue()))?,
-            // Sphere::new(&Vec3::new(r, 0.0, -1.0), r, Lambertian::new(Color::red()))?,
-        ];
+        // let vec = vec![
+        //     Sphere::new(
+        //         &Vec3::new(0.0, 0.0, -1.0),
+        //         0.5,
+        //         Lambertian::new(Color::new(0.8, 0.3, 0.3)?),
+        //     )?,
+        //     Sphere::new(
+        //         &Vec3::new(0.0, -100.5, -1.0),
+        //         100.0,
+        //         Lambertian::new(Color::new(0.3, 0.3, 0.8)?),
+        //     )?,
+        //     Sphere::new(
+        //         &Vec3::new(1.0, 0.0, -1.0),
+        //         0.5,
+        //         Metal::new(Color::new(0.8, 0.6, 0.2)?),
+        //     )?,
+        //     Sphere::new(&Vec3::new(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
+        //     // Sphere::new(&Vec3::new(-r, 0.0, -1.0), r, Lambertian::new(Color::blue()))?,
+        //     // Sphere::new(&Vec3::new(r, 0.0, -1.0), r, Lambertian::new(Color::red()))?,
+        // ];
+        let world = random_scene()?;
 
         let pb = ProgressBar::new((height * width) as u64);
 
@@ -78,7 +113,7 @@ fn path_trace(config: &Config) -> Result<()> {
                     let u = (x as f32 + unit_random()) / width;
                     let v = (y as f32 + unit_random()) / height;
                     let ray = camera.get_ray(u, v);
-                    color_vec = color_vec + color(&ray, &vec, 0, config.max_depth).as_vec();
+                    color_vec = color_vec + color(&ray, &world, 0, config.max_depth).as_vec();
                 }
 
                 fb.set(x, y, Color::from(color_vec / config.num_samples as f32));
