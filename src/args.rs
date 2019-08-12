@@ -85,8 +85,8 @@ where
     I: IntoIterator<Item = T>,
     T: Into<OsString> + Clone,
 {
-    App::new("myray")
-        .about("My little toy path tracer.")
+    App::new(crate_name!())
+        .about(crate_description!())
         .author(crate_authors!())
         .version(crate_version!())
         .setting(AppSettings::StrictUtf8)
