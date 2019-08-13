@@ -142,6 +142,7 @@ fn path_trace(config: &Config) -> Result<()> {
         let world = world_from_config(config)?;
 
         let pb = ProgressBar::new((height * width) as u64);
+        pb.set_draw_delta((10000 / config.num_samples) as u64);
 
         for y in 0..config.screen_height {
             for x in 0..config.screen_width {
