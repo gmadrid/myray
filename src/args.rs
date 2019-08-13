@@ -8,6 +8,7 @@ use minifb::Scale;
 
 use crate::errors::*;
 
+const CAMERA_FROM: (&str, &str) = ("camera_from", "XXX");
 const MAX_DEPTH: (&str, &str) = ("max_depth", "50");
 const NUM_SAMPLES: (&str, &str) = ("num_samples", "5");
 const SCALE: (&str, &str) = ("scale", "1");

@@ -2,6 +2,7 @@ use crate::errors::*;
 use crate::ray::Ray;
 use crate::vec3::{cross, Vec3};
 
+#[derive(Debug)]
 pub struct Camera {
     origin: Vec3,
     lower_left_corner: Vec3,
@@ -11,12 +12,13 @@ pub struct Camera {
 
 impl Camera {
     pub fn new() -> Result<Camera> {
-        Ok(Camera {
-            origin: Vec3::new(0.0, 0.0, 0.0),
-            lower_left_corner: Vec3::new(-2.0, -1.0, -1.0),
-            horizontal: Vec3::new(4.0, 0.0, 0.0),
-            vertical: Vec3::new(0.0, 2.0, 0.0),
-        })
+        Camera::new_from_to(
+            &Vec3::new(0.0, 0.0, 0.0),
+            &Vec3::new(0.0, 0.0, -1.0),
+            &Vec3::new(0.0, 1.0, 0.0),
+            90.0,
+            2.0,
+        )
     }
 
     pub fn new_with_vert_fov(vfov: f32, aspect: f32) -> Result<Camera> {
@@ -45,6 +47,7 @@ impl Camera {
         let w = (lookfrom - lookat).unit_vector();
         let u = cross(&vup, &w).unit_vector();
         let v = cross(&w, &u);
+
         Ok(Camera {
             lower_left_corner: origin - half_width * u - half_height * v - w,
             horizontal: 2.0 * half_width * u,
