@@ -64,7 +64,7 @@ impl<'a> TryFrom<Args<'a>> for Config {
             screen_width: args.parsed_value(SCREEN_WIDTH)?,
             screen_height: args.parsed_value(SCREEN_HEIGHT)?,
             num_samples: args.parsed_value(NUM_SAMPLES)?,
-            world: args.parsed_world(WORLD)?,
+            world: args.parsed_value(WORLD)?,
         })
     }
 }
@@ -97,18 +97,15 @@ impl<'a> Args<'a> {
         })
     }
 
-    fn parsed_world(&self, desc: (&str, &str)) -> Result<Worlds> {
+    fn parsed_value<T>(&self, desc: (&str, &str)) -> Result<T>
+    where
+        T: FromStr,
+        Error: From<<T as FromStr>::Err>,
+    {
         self.matches
             .value_of_lossy(desc.0)
             .ok_or_else(|| ErrorKind::MissingParam(desc.0.to_string()).into())
-            .and_then(|cow| Ok(Worlds::from_str(&cow)?))
-    }
-
-    fn parsed_value(&self, desc: (&str, &str)) -> Result<usize> {
-        self.matches
-            .value_of_lossy(desc.0)
-            .ok_or_else(|| ErrorKind::MissingParam(desc.0.to_string()).into())
-            .and_then(|cow| Ok(usize::from_str(&cow)?))
+            .and_then(|cow| Ok(T::from_str(&cow)?))
     }
 }
 
