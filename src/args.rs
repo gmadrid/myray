@@ -13,6 +13,28 @@ const NUM_SAMPLES: (&str, &str) = ("num_samples", "5");
 const SCALE: (&str, &str) = ("scale", "1");
 const SCREEN_HEIGHT: (&str, &str) = ("screen_height", "240");
 const SCREEN_WIDTH: (&str, &str) = ("screen_width", "320");
+const WORLD: (&str, &str) = ("world", "threeballs");
+
+pub enum Worlds {
+    ThreeBalls,
+    Random,
+}
+
+impl FromStr for Worlds {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Worlds> {
+        match s.to_lowercase().as_str() {
+            "threeballs" => Ok(Worlds::ThreeBalls),
+            "random" => Ok(Worlds::Random),
+            _ => Err(ErrorKind::ParseError(
+                s.to_string(),
+                "Must be 'threeballs' or 'random'.".to_string(),
+            )
+            .into()),
+        }
+    }
+}
 
 pub struct Config {
     pub max_depth: usize,
@@ -22,6 +44,8 @@ pub struct Config {
     pub screen_height: usize,
 
     pub num_samples: usize,
+
+    pub world: Worlds,
 }
 
 impl Config {
@@ -40,6 +64,7 @@ impl<'a> TryFrom<Args<'a>> for Config {
             screen_width: args.parsed_value(SCREEN_WIDTH)?,
             screen_height: args.parsed_value(SCREEN_HEIGHT)?,
             num_samples: args.parsed_value(NUM_SAMPLES)?,
+            world: args.parsed_world(WORLD)?,
         })
     }
 }
@@ -70,6 +95,13 @@ impl<'a> Args<'a> {
         Ok(Args {
             matches: parse_from(env::args_os())?,
         })
+    }
+
+    fn parsed_world(&self, desc: (&str, &str)) -> Result<Worlds> {
+        self.matches
+            .value_of_lossy(desc.0)
+            .ok_or_else(|| ErrorKind::MissingParam(desc.0.to_string()).into())
+            .and_then(|cow| Ok(Worlds::from_str(&cow)?))
     }
 
     fn parsed_value(&self, desc: (&str, &str)) -> Result<usize> {
@@ -134,6 +166,13 @@ where
                 .takes_value(true)
                 .visible_alias("md")
                 .help("Max depth for scattered rays.")
+        )
+        .arg(
+            Arg::with_name(WORLD.0)
+                .long(WORLD.0)
+                .default_value(WORLD.1)
+                .takes_value(true)
+                .help("'threeballs' or 'random'")
         )
         .get_matches_from_safe(itr)
         .map_err(Error::from)

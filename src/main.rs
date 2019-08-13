@@ -5,7 +5,7 @@ use indicatif::ProgressBar;
 use rays::errors::*;
 use rays::{
     gradient, unit_random, Camera, Color, Config, Dielectric, HitTest, Lambertian, Metal, Ray,
-    Screen, Sphere, Vec3,
+    Screen, Sphere, Vec3, Worlds,
 };
 
 const BACKGROUND_HUE: f32 = 205.0;
@@ -33,75 +33,113 @@ fn color(ray: &Ray, hit_test: &impl HitTest, depth: usize, max_depth: usize) -> 
     }
 }
 
+fn three_balls() -> Result<Vec<Sphere>> {
+    Ok(vec![
+        Sphere::new(
+            &Vec3::new(0.0, 0.0, -1.0),
+            0.5,
+            Lambertian::new(Color::new(0.8, 0.3, 0.3)?),
+        )?,
+        Sphere::new(
+            &Vec3::new(0.0, -100.5, -1.0),
+            100.0,
+            Lambertian::new(Color::new(0.3, 0.3, 0.8)?),
+        )?,
+        Sphere::new(
+            &Vec3::new(1.0, 0.0, -1.0),
+            0.5,
+            Metal::new(Color::new(0.8, 0.6, 0.2)?),
+        )?,
+        Sphere::new(&Vec3::new(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
+    ])
+}
+
 fn random_scene() -> Result<Vec<Sphere>> {
     let mut world = Vec::new();
 
-    world.push(Sphere::new(&Vec3::new(0.0, -1000.0, 0.0), 1000.0,
-                           Lambertian::new(Color::new(0.5, 0.5, 0.5)?))?);
+    world.push(Sphere::new(
+        &Vec3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Lambertian::new(Color::new(0.5, 0.5, 0.5)?),
+    )?);
 
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = unit_random();
-            let center = Vec3::new(a as f32 + 0.9 * unit_random(), 0.2, b as f32 + 0.9 + unit_random());
-            if (center-Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                if choose_mat < 0.8 { // diffuse
-                    world.push(Sphere::new(&center, 0.2,
-                                           Lambertian::new(Color::new(unit_random() * unit_random(),
-                                                                      unit_random() * unit_random(),
-                                                                      unit_random() * unit_random())?))?);
+            let center = Vec3::new(
+                a as f32 + 0.9 * unit_random(),
+                0.2,
+                b as f32 + 0.9 + unit_random(),
+            );
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    world.push(Sphere::new(
+                        &center,
+                        0.2,
+                        Lambertian::new(Color::new(
+                            unit_random() * unit_random(),
+                            unit_random() * unit_random(),
+                            unit_random() * unit_random(),
+                        )?),
+                    )?);
                 } else if choose_mat < 0.95 {
-                    world.push(Sphere::new(&center, 0.2,
-                                           Metal::new(Color::new(0.5 * (1.0 + unit_random()),
-                                                                 0.5 * (1.0 + unit_random()),
-                                                                 0.5 * (1.0 + unit_random()))?))?);
+                    world.push(Sphere::new(
+                        &center,
+                        0.2,
+                        Metal::new(Color::new(
+                            0.5 * (1.0 + unit_random()),
+                            0.5 * (1.0 + unit_random()),
+                            0.5 * (1.0 + unit_random()),
+                        )?),
+                    )?);
                 }
-                
             }
         }
     }
 
-    world.push(Sphere::new(&Vec3::new(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5))?);
-    world.push(Sphere::new(&Vec3::new(-4.0, 1.0, 0.0), 1.0, Lambertian::new(Color::new(0.4, 0.2, 0.1)?))?);
-    world.push(Sphere::new(&Vec3::new(4.0, 1.0, 0.0), 1.0, Metal::new(Color::new(0.7, 0.6, 0.5)?))?);
+    world.push(Sphere::new(
+        &Vec3::new(0.0, 1.0, 0.0),
+        1.0,
+        Dielectric::new(1.5),
+    )?);
+    world.push(Sphere::new(
+        &Vec3::new(-4.0, 1.0, 0.0),
+        1.0,
+        Lambertian::new(Color::new(0.4, 0.2, 0.1)?),
+    )?);
+    world.push(Sphere::new(
+        &Vec3::new(4.0, 1.0, 0.0),
+        1.0,
+        Metal::new(Color::new(0.7, 0.6, 0.5)?),
+    )?);
 
     Ok(world)
+}
+
+fn world_from_config(config: &Config) -> Result<Vec<Sphere>> {
+    match config.world {
+        Worlds::ThreeBalls => three_balls(),
+        Worlds::Random => random_scene(),
+    }
 }
 
 fn path_trace(config: &Config) -> Result<()> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     //let camera = Camera::new()?;
-    let camera = Camera::new_from_to(&Vec3::new(5.0, 2.0, 1.5),
-                                     &Vec3::new(0.0, 0.0, -1.0),
-                                     &Vec3::new(0.0, 1.0, 0.0),
-                                     90.0,
-                                     screen.height() as f32 / screen.width() as f32)?;
+    let camera = Camera::new_from_to(
+        &Vec3::new(5.0, 2.0, 1.5),
+        &Vec3::new(0.0, 0.0, -1.0),
+        &Vec3::new(0.0, 1.0, 0.0),
+        90.0,
+        screen.height() as f32 / screen.width() as f32,
+    )?;
 
     screen.one_frame(|fb| {
         let height = fb.height() as f32;
         let width = fb.width() as f32;
 
-        //        let r = f32::cos(std::f32::consts::PI / 4.0);
-        // let vec = vec![
-        //     Sphere::new(
-        //         &Vec3::new(0.0, 0.0, -1.0),
-        //         0.5,
-        //         Lambertian::new(Color::new(0.8, 0.3, 0.3)?),
-        //     )?,
-        //     Sphere::new(
-        //         &Vec3::new(0.0, -100.5, -1.0),
-        //         100.0,
-        //         Lambertian::new(Color::new(0.3, 0.3, 0.8)?),
-        //     )?,
-        //     Sphere::new(
-        //         &Vec3::new(1.0, 0.0, -1.0),
-        //         0.5,
-        //         Metal::new(Color::new(0.8, 0.6, 0.2)?),
-        //     )?,
-        //     Sphere::new(&Vec3::new(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
-        //     // Sphere::new(&Vec3::new(-r, 0.0, -1.0), r, Lambertian::new(Color::blue()))?,
-        //     // Sphere::new(&Vec3::new(r, 0.0, -1.0), r, Lambertian::new(Color::red()))?,
-        // ];
-        let world = random_scene()?;
+        let world = world_from_config(config)?;
 
         let pb = ProgressBar::new((height * width) as u64);
 

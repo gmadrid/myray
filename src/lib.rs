@@ -19,7 +19,7 @@ pub mod errors {
             }
             MissingParam(val: String) {
                 description("Missing command line argument.")
-                display("'{}' must be specified (or have a default", val)
+                display("'{}' must be specified (or have a default).", val)
             }
             OutOfRange(val: f32, min: f32, max: f32) {
                 description("Value out of range.")
@@ -40,7 +40,7 @@ pub mod errors {
 
 }
 
-pub use args::Config;
+pub use args::{Config, Worlds};
 pub use camera::Camera;
 pub use color::{gradient, Color};
 pub use hittest::{HitRecord, HitTest};
