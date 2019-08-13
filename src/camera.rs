@@ -12,25 +12,17 @@ pub struct Camera {
 
 impl Camera {
     pub fn new() -> Result<Camera> {
+        Camera::new_with_vert_fov(90.0, 2.0)
+    }
+
+    pub fn new_with_vert_fov(vfov: f32, aspect: f32) -> Result<Camera> {
         Camera::new_from_to(
             &Vec3::new(0.0, 0.0, 0.0),
             &Vec3::new(0.0, 0.0, -1.0),
             &Vec3::new(0.0, 1.0, 0.0),
-            90.0,
-            2.0,
+            vfov,
+            aspect,
         )
-    }
-
-    pub fn new_with_vert_fov(vfov: f32, aspect: f32) -> Result<Camera> {
-        let theta = vfov * std::f32::consts::PI / 180.0;
-        let half_height = f32::tan(theta / 2.0);
-        let half_width = half_height * aspect;
-        Ok(Camera {
-            lower_left_corner: Vec3::new(-half_width, -half_height, -1.0),
-            horizontal: Vec3::new(2.0 * half_width, 0.0, 0.0),
-            vertical: Vec3::new(0.0, 2.0 * half_height, 0.0),
-            origin: Vec3::origin(),
-        })
     }
 
     pub fn new_from_to(
