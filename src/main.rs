@@ -45,7 +45,6 @@ fn path_trace(config: &Config) -> Result<()> {
         let height = fb.height() as f32;
         let width = fb.width() as f32;
 
-//        let world = world_from_config(config)?;
         let world = load_world(config.world);
 
         let mut pg = Progress::new((height * width) as u64);
