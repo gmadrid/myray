@@ -7,8 +7,11 @@ use clap::{App, AppSettings, Arg, ArgMatches};
 use minifb::Scale;
 
 use crate::errors::*;
+use crate::vec3::Vec3;
 
-const CAMERA_FROM: (&str, &str) = ("camera_from", "XXX");
+const LOOK_FROM: (&str, &str) = ("look_from", "(0, 0, 0)");
+const LOOK_TO: (&str, &str) = ("look_to", "(0, 0, -1)");
+const LOOK_UP: (&str, &str) = ("look_up", "(0, 1, 0)");
 const MAX_DEPTH: (&str, &str) = ("max_depth", "50");
 const NUM_SAMPLES: (&str, &str) = ("num_samples", "5");
 const SCALE: (&str, &str) = ("scale", "1");
@@ -46,6 +49,10 @@ pub struct Config {
 
     pub num_samples: usize,
 
+    pub camera_from: Vec3,
+    pub camera_to: Vec3,
+    pub camera_up: Vec3,
+
     pub world: Worlds,
 }
 
@@ -60,6 +67,9 @@ impl<'a> TryFrom<Args<'a>> for Config {
 
     fn try_from(args: Args<'a>) -> Result<Self> {
         Ok(Config {
+            camera_from: args.parsed_value(LOOK_FROM)?,
+            camera_to: args.parsed_value(LOOK_TO)?,
+            camera_up: args.parsed_value(LOOK_UP)?,
             max_depth: args.parsed_value(MAX_DEPTH)?,
             scale: args.parsed_value(SCALE).and_then(num_to_scale)?,
             screen_width: args.parsed_value(SCREEN_WIDTH)?,
@@ -171,6 +181,30 @@ where
                 .default_value(WORLD.1)
                 .takes_value(true)
                 .help("'threeballs' or 'random'")
+        )
+        .arg(
+            Arg::with_name(LOOK_FROM.0)
+                .long(LOOK_FROM.0)
+                .takes_value(true)
+                .visible_alias("from")
+                .default_value(LOOK_FROM.1)
+                .help("Position to look from")
+        )
+        .arg(
+            Arg::with_name(LOOK_TO.0)
+                .long(LOOK_TO.0)
+                .takes_value(true)
+                .visible_alias("to")
+                .default_value(LOOK_TO.1)
+                .help("Position to look at")
+        )
+        .arg(
+            Arg::with_name(LOOK_UP.0)
+                .long(LOOK_UP.0)
+                .takes_value(true)
+                .visible_alias("up")
+                .default_value(LOOK_UP.1)
+                .help("Up vector in the camera plane.")
         )
         .get_matches_from_safe(itr)
         .map_err(Error::from)

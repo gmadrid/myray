@@ -128,9 +128,9 @@ fn path_trace(config: &Config) -> Result<()> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     //let camera = Camera::new()?;
     let camera = Camera::new_from_to(
-        &Vec3::new(5.0, 2.0, 1.5),
-        &Vec3::new(0.0, 0.0, -1.0),
-        &Vec3::new(0.0, 1.0, 0.0),
+        &config.camera_from,
+        &config.camera_to,
+        &config.camera_up,
         90.0,
         screen.height() as f32 / screen.width() as f32,
     )?;
