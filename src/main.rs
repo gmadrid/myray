@@ -1,12 +1,12 @@
 use std::f32;
 
-use indicatif::ProgressBar;
-
 use rays::errors::*;
 use rays::{
     gradient, unit_random, Camera, Color, Config, Dielectric, HitTest, Lambertian, Metal, Ray,
     Screen, Sphere, Vec3, Worlds,
 };
+
+use rays::Progress;
 
 const BACKGROUND_HUE: f32 = 205.0;
 
@@ -141,12 +141,11 @@ fn path_trace(config: &Config) -> Result<()> {
 
         let world = world_from_config(config)?;
 
-        let pb = ProgressBar::new((height * width) as u64);
-        pb.set_draw_delta((10000 / config.num_samples) as u64);
+        let mut pg = Progress::new((height * width) as u64);
 
         for y in 0..config.screen_height {
             for x in 0..config.screen_width {
-                pb.inc(1);
+                pg.inc();
                 let mut color_vec = Vec3::new(0.0, 0.0, 0.0);
                 for _ in 0..config.num_samples {
                     let u = (x as f32 + unit_random()) / width;
@@ -158,7 +157,7 @@ fn path_trace(config: &Config) -> Result<()> {
                 fb.set(x, y, Color::from(color_vec / config.num_samples as f32));
             }
         }
-        pb.finish_and_clear();
+        pg.finish_and_clear();
         Ok(())
     })?;
 

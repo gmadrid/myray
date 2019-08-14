@@ -52,12 +52,15 @@ pub use unit_random::unit_random;
 pub use util::random_in_unit_sphere;
 pub use vec3::{dot, Vec3};
 
+pub use pg::Progress;
+
 mod args;
 mod camera;
 mod color;
 mod fb;
 mod hittest;
 mod material;
+mod pg;
 mod ray;
 mod screen;
 mod sphere;
