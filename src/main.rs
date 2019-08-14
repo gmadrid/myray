@@ -5,9 +5,7 @@ use rays::{gradient, load_world, unit_random, Camera, Color, Config, HitTest, Ra
 
 use rays::Progress;
 
-const BACKGROUND_HUE: f32 = 205.0;
-
-fn color(ray: &Ray, hit_test: &impl HitTest, depth: usize, max_depth: usize) -> Color {
+fn color(ray: &Ray, hit_test: &impl HitTest, hue: f32, depth: usize, max_depth: usize) -> Color {
     if let Some(hit_record) = hit_test.hit_test(ray, 0.001, f32::MAX) {
         if depth >= max_depth {
             return Color::black();
@@ -15,18 +13,14 @@ fn color(ray: &Ray, hit_test: &impl HitTest, depth: usize, max_depth: usize) -> 
 
         if let Some((scattered, attenuation)) = hit_record.material.scatter(ray, &hit_record) {
             return Color::from(
-                attenuation * color(&scattered, hit_test, depth + 1, max_depth).as_vec(),
+                attenuation * color(&scattered, hit_test, hue, depth + 1, max_depth).as_vec(),
             );
         }
         return Color::black();
     } else {
         let unit_direction = ray.direction().unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.0);
-        gradient(
-            t,
-            &Color::white(),
-            &Color::from_hsv(BACKGROUND_HUE, 0.5, 1.0).unwrap(),
-        )
+        gradient(t, &Color::white(), &Color::from_hsv(hue, 0.5, 1.0).unwrap())
     }
 }
 
@@ -57,7 +51,8 @@ fn path_trace(config: &Config) -> Result<()> {
                     let u = (x as f32 + unit_random()) / width;
                     let v = (y as f32 + unit_random()) / height;
                     let ray = camera.get_ray(u, v);
-                    color_vec = color_vec + color(&ray, &world, 0, config.max_depth).as_vec();
+                    color_vec =
+                        color_vec + color(&ray, &world, config.hue, 0, config.max_depth).as_vec();
                 }
 
                 fb.set(x, y, Color::from(color_vec / config.num_samples as f32));

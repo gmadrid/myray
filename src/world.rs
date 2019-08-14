@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use crate::color::Color;
 use crate::errors::*;
-use crate::material::{Lambertian, Metal, Dielectric};
-use crate::unit_random::unit_random;
+use crate::material::{Dielectric, Lambertian, Metal};
 use crate::sphere::Sphere;
+use crate::unit_random::unit_random;
 use crate::vec3::Vec3;
 
 pub type World = Vec<Sphere>;
@@ -35,7 +35,8 @@ pub fn load_world(world: Worlds) -> World {
     match world {
         Worlds::ThreeBalls => three_balls(),
         Worlds::Random => random_scene(),
-    }.unwrap()
+    }
+    .unwrap()
 }
 
 fn three_balls() -> Result<World> {
@@ -121,4 +122,3 @@ fn random_scene() -> Result<World> {
 
     Ok(world)
 }
-

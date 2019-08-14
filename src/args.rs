@@ -10,6 +10,7 @@ use crate::errors::*;
 use crate::vec3::Vec3;
 use crate::world::Worlds;
 
+const HUE: (&str, &str) = ("background_hue", "205");
 const LOOK_FROM: (&str, &str) = ("look_from", "(0, 0, 0)");
 const LOOK_TO: (&str, &str) = ("look_to", "(0, 0, -1)");
 const LOOK_UP: (&str, &str) = ("look_up", "(0, 1, 0)");
@@ -21,6 +22,7 @@ const SCREEN_WIDTH: (&str, &str) = ("screen_width", "320");
 const WORLD: (&str, &str) = ("world", "threeballs");
 
 pub struct Config {
+    pub hue: f32,
     pub max_depth: usize,
     pub scale: Scale,
 
@@ -50,6 +52,7 @@ impl<'a> TryFrom<Args<'a>> for Config {
             camera_from: args.parsed_value(LOOK_FROM)?,
             camera_to: args.parsed_value(LOOK_TO)?,
             camera_up: args.parsed_value(LOOK_UP)?,
+            hue: args.parsed_value(HUE)?,
             max_depth: args.parsed_value(MAX_DEPTH)?,
             scale: args.parsed_value(SCALE).and_then(num_to_scale)?,
             screen_width: args.parsed_value(SCREEN_WIDTH)?,
@@ -185,6 +188,14 @@ where
                 .visible_alias("up")
                 .default_value(LOOK_UP.1)
                 .help("Up vector in the camera plane.")
+        )
+        .arg(
+            Arg::with_name(HUE.0)
+                .long(HUE.0)
+                .takes_value(true)
+                .visible_alias("hue")
+                .default_value(HUE.1)
+                .help("Base hue for the background.")
         )
         .get_matches_from_safe(itr)
         .map_err(Error::from)
