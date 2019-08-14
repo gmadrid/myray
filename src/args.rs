@@ -8,6 +8,7 @@ use minifb::Scale;
 
 use crate::errors::*;
 use crate::vec3::Vec3;
+use crate::world::Worlds;
 
 const LOOK_FROM: (&str, &str) = ("look_from", "(0, 0, 0)");
 const LOOK_TO: (&str, &str) = ("look_to", "(0, 0, -1)");
@@ -18,27 +19,6 @@ const SCALE: (&str, &str) = ("scale", "1");
 const SCREEN_HEIGHT: (&str, &str) = ("screen_height", "240");
 const SCREEN_WIDTH: (&str, &str) = ("screen_width", "320");
 const WORLD: (&str, &str) = ("world", "threeballs");
-
-pub enum Worlds {
-    ThreeBalls,
-    Random,
-}
-
-impl FromStr for Worlds {
-    type Err = Error;
-
-    fn from_str(s: &str) -> Result<Worlds> {
-        match s.to_lowercase().as_str() {
-            "threeballs" => Ok(Worlds::ThreeBalls),
-            "random" => Ok(Worlds::Random),
-            _ => Err(ErrorKind::ParseError(
-                s.to_string(),
-                "Must be 'threeballs' or 'random'.".to_string(),
-            )
-            .into()),
-        }
-    }
-}
 
 pub struct Config {
     pub max_depth: usize,

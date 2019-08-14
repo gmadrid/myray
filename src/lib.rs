@@ -40,7 +40,7 @@ pub mod errors {
 
 }
 
-pub use args::{Config, Worlds};
+pub use args::Config;
 pub use camera::Camera;
 pub use color::{gradient, Color};
 pub use hittest::{HitRecord, HitTest};
@@ -51,6 +51,7 @@ pub use sphere::Sphere;
 pub use unit_random::unit_random;
 pub use util::random_in_unit_sphere;
 pub use vec3::{dot, Vec3};
+pub use world::{load_world, World, Worlds};
 
 pub use pg::Progress;
 
@@ -67,3 +68,4 @@ mod sphere;
 mod unit_random;
 mod util;
 mod vec3;
+mod world;
