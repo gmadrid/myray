@@ -3,7 +3,7 @@ use std::f32;
 use rays::errors::*;
 use rays::{
     gradient, load_world, unit_random, Camera, Color, Config, HitTest, IncrementalFrameBuffer, Ray,
-    Screen, Vec3,
+    Screen, Vec3, World,
 };
 
 use rays::Progress;
@@ -48,10 +48,7 @@ fn path_trace_inc(config: &Config) -> Result<()> {
         screen.one_frame(|fb| {
             for y in 0..config.screen_height {
                 for x in 0..config.screen_width {
-                    let u = (x as f32 + unit_random()) / width;
-                    let v = (y as f32 + unit_random()) / height;
-                    let ray = camera.get_ray(u, v);
-                    let color = color(&ray, &world, config.hue, 0, config.max_depth);
+                    let color = sample_color(config, &world, &camera, x, y, width, height);
                     ifb.set(x, y, color);
                 }
             }
@@ -65,6 +62,21 @@ fn path_trace_inc(config: &Config) -> Result<()> {
 
     screen.wait()?;
     Ok(())
+}
+
+fn sample_color(
+    config: &Config,
+    world: &World,
+    camera: &Camera,
+    x: usize,
+    y: usize,
+    width: f32,
+    height: f32,
+) -> Color {
+    let u = (x as f32 + unit_random()) / width;
+    let v = (y as f32 + unit_random()) / height;
+    let ray = camera.get_ray(u, v);
+    color(&ray, world, config.hue, 0, config.max_depth)
 }
 
 fn path_trace(config: &Config) -> Result<()> {
@@ -89,11 +101,8 @@ fn path_trace(config: &Config) -> Result<()> {
                 pg.inc();
                 let mut color_vec = Vec3::new(0.0, 0.0, 0.0);
                 for _ in 0..config.num_samples {
-                    let u = (x as f32 + unit_random()) / width;
-                    let v = (y as f32 + unit_random()) / height;
-                    let ray = camera.get_ray(u, v);
-                    color_vec =
-                        color_vec + color(&ray, &world, config.hue, 0, config.max_depth).as_vec();
+                    color_vec = color_vec
+                        + sample_color(config, &world, &camera, x, y, width, height).as_vec();
                 }
 
                 fb.set(x, y, Color::from(color_vec / config.num_samples as f32));
