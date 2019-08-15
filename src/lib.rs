@@ -43,6 +43,7 @@ pub mod errors {
 pub use args::Config;
 pub use camera::Camera;
 pub use color::{gradient, Color};
+pub use fb::IncrementalFrameBuffer;
 pub use hittest::{HitRecord, HitTest};
 pub use material::{Dielectric, Lambertian, Material, Metal};
 pub use ray::Ray;

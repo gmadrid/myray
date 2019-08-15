@@ -1,7 +1,10 @@
 use std::f32;
 
 use rays::errors::*;
-use rays::{gradient, load_world, unit_random, Camera, Color, Config, HitTest, Ray, Screen, Vec3};
+use rays::{
+    gradient, load_world, unit_random, Camera, Color, Config, HitTest, IncrementalFrameBuffer, Ray,
+    Screen, Vec3,
+};
 
 use rays::Progress;
 
@@ -24,9 +27,48 @@ fn color(ray: &Ray, hit_test: &impl HitTest, hue: f32, depth: usize, max_depth: 
     }
 }
 
+fn path_trace_inc(config: &Config) -> Result<()> {
+    let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
+    let camera = Camera::new_from_to(
+        &config.camera_from,
+        &config.camera_to,
+        &config.camera_up,
+        90.0,
+        screen.height() as f32 / screen.width() as f32,
+    )?;
+
+    let height = screen.height() as f32;
+    let width = screen.width() as f32;
+    let world = load_world(config.world);
+    let mut pg = Progress::new(config.num_samples as u64);
+
+    let mut ifb = IncrementalFrameBuffer::new(screen.width(), screen.height())?;
+
+    for n in 0..config.num_samples {
+        screen.one_frame(|fb| {
+            for y in 0..config.screen_height {
+                for x in 0..config.screen_width {
+                    let u = (x as f32 + unit_random()) / width;
+                    let v = (y as f32 + unit_random()) / height;
+                    let ray = camera.get_ray(u, v);
+                    let color = color(&ray, &world, config.hue, 0, config.max_depth);
+                    ifb.set(x, y, color);
+                }
+            }
+            ifb.to_fb(n as u32, fb);
+            Ok(())
+        })?;
+
+        pg.inc();
+    }
+    pg.finish_and_clear();
+
+    screen.wait()?;
+    Ok(())
+}
+
 fn path_trace(config: &Config) -> Result<()> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
-    //let camera = Camera::new()?;
     let camera = Camera::new_from_to(
         &config.camera_from,
         &config.camera_to,
@@ -42,7 +84,6 @@ fn path_trace(config: &Config) -> Result<()> {
         let world = load_world(config.world);
 
         let mut pg = Progress::new((height * width) as u64);
-
         for y in 0..config.screen_height {
             for x in 0..config.screen_width {
                 pg.inc();
@@ -69,7 +110,7 @@ fn path_trace(config: &Config) -> Result<()> {
 
 fn real_main() -> Result<()> {
     let config = Config::new()?;
-    path_trace(&config)
+    path_trace_inc(&config)
 }
 
 fn main() {
