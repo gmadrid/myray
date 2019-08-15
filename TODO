@@ -1,0 +1,5 @@
+- Read/write worlds from/to file.
+- depth map
+- --vfov cmdline arg
+- saving images
+
