@@ -1,3 +1,5 @@
+use serde::{Serialize, Deserialize};
+
 use crate::color::Color;
 use crate::hittest::HitRecord;
 use crate::ray::Ray;
@@ -9,6 +11,7 @@ pub trait Material {
     fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)>;
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Lambertian {
     albedo: Vec3,
 }
@@ -29,6 +32,7 @@ impl Material for Lambertian {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Metal {
     albedo: Vec3,
 }
@@ -56,6 +60,7 @@ impl Material for Metal {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Dielectric {
     refractive_index: f32,
 }

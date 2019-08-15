@@ -1,4 +1,6 @@
+use std::fs::File;
 use std::f32;
+use std::path::Path;
 
 use rays::errors::*;
 use rays::{
@@ -27,7 +29,7 @@ fn color(ray: &Ray, hit_test: &impl HitTest, hue: f32, depth: usize, max_depth: 
     }
 }
 
-fn path_trace_inc(config: &Config) -> Result<()> {
+fn path_trace_inc(config: &Config) -> Result<World> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     let camera = Camera::new_from_to(
         &config.camera_from,
@@ -61,7 +63,7 @@ fn path_trace_inc(config: &Config) -> Result<()> {
     pg.finish_and_clear();
 
     screen.wait()?;
-    Ok(())
+    Ok(world)
 }
 
 fn sample_color(
@@ -119,7 +121,21 @@ fn path_trace(config: &Config) -> Result<()> {
 
 fn real_main() -> Result<()> {
     let config = Config::new()?;
-    path_trace_inc(&config)
+    let world = path_trace_inc(&config)?;
+
+    if let Some(filename) = config.write_world {
+        let path: &Path = filename.as_ref();
+        let path_ref = if path.extension().is_none() {
+            path.with_extension("yaml")
+        } else {
+            path.to_path_buf()
+        };
+        let file = File::create(path).unwrap(); // TODO ?;
+        serde_yaml::to_writer(file, &world).unwrap(); // TODO ?;
+//        println!("WRITING: {:?}", path_ref);
+    }
+
+    Ok(())
 }
 
 fn main() {

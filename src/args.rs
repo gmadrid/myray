@@ -20,6 +20,7 @@ const SCALE: (&str, &str) = ("scale", "1");
 const SCREEN_HEIGHT: (&str, &str) = ("screen_height", "240");
 const SCREEN_WIDTH: (&str, &str) = ("screen_width", "320");
 const WORLD: (&str, &str) = ("world", "threeballs");
+const WRITE_WORLD: &str = "write_world";
 
 pub struct Config {
     pub hue: f32,
@@ -36,6 +37,7 @@ pub struct Config {
     pub camera_up: Vec3,
 
     pub world: Worlds,
+    pub write_world: Option<OsString>,
 }
 
 impl Config {
@@ -59,6 +61,7 @@ impl<'a> TryFrom<Args<'a>> for Config {
             screen_height: args.parsed_value(SCREEN_HEIGHT)?,
             num_samples: args.parsed_value(NUM_SAMPLES)?,
             world: args.parsed_value(WORLD)?,
+            write_world: args.if_present_os(WRITE_WORLD),
         })
     }
 }
@@ -100,6 +103,10 @@ impl<'a> Args<'a> {
             .value_of_lossy(desc.0)
             .ok_or_else(|| ErrorKind::MissingParam(desc.0.to_string()).into())
             .and_then(|cow| Ok(T::from_str(&cow)?))
+    }
+
+    fn if_present_os(&self, name: &str) -> Option<OsString> {
+        self.matches.value_of_os(name).map(OsString::from)
     }
 }
 
@@ -196,6 +203,12 @@ where
                 .visible_alias("hue")
                 .default_value(HUE.1)
                 .help("Base hue for the background.")
+        )
+        .arg(
+            Arg::with_name(WRITE_WORLD)
+                .long(WRITE_WORLD)
+                .takes_value(true)
+                .help("Output file for world description.")
         )
         .get_matches_from_safe(itr)
         .map_err(Error::from)

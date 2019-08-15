@@ -1,3 +1,5 @@
+use serde::{Serialize, Deserialize};
+
 use crate::errors::*;
 use crate::hittest::{HitRecord, HitTest};
 use crate::material::Material;
@@ -5,6 +7,7 @@ use crate::ray::Ray;
 use crate::util::if_then;
 use crate::vec3::{dot, Vec3};
 
+#[derive(Serialize, Deserialize)]
 pub struct Sphere {
     center: Vec3,
     radius: f32,
