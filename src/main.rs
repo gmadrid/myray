@@ -55,7 +55,7 @@ fn path_trace_inc(config: &Config) -> Result<()> {
                     ifb.set(x, y, color);
                 }
             }
-            ifb.to_fb(n as u32, fb);
+            ifb.copy_to_fb(n as u32, fb);
             Ok(())
         })?;
 

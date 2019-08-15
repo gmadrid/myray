@@ -27,13 +27,13 @@ impl IncrementalFrameBuffer {
 
     pub fn set(&mut self, x: usize, y: usize, color: Color) {
         let start_index = (self.height - y - 1) * 3 * self.width + x * 3;
-        self.buffer[start_index] += color.r as f64;
-        self.buffer[start_index + 1] += color.g as f64;
-        self.buffer[start_index + 2] += color.b as f64;
+        self.buffer[start_index] += f64::from(color.r);
+        self.buffer[start_index + 1] += f64::from(color.g);
+        self.buffer[start_index + 2] += f64::from(color.b);
     }
 
-    pub fn to_fb(&mut self, n: u32, fb: &mut FrameBuffer) {
-        let div = n as f64 + 1.0;
+    pub fn copy_to_fb(&mut self, n: u32, fb: &mut FrameBuffer) {
+        let div = f64::from(n) + 1.0;
         let i = self.buffer.chunks(3).map(|chunk| {
             let r = chunk[0] / div;
             let g = chunk[1] / div;

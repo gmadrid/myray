@@ -58,13 +58,13 @@ impl FromStr for Vec3 {
 
     fn from_str(s: &str) -> Result<Vec3> {
         let trimmed = s.trim();
-        if !trimmed.starts_with("(") {
+        if !trimmed.starts_with('(') {
             return Err(
                 ErrorKind::ParseError(s.to_string(), "Must start with '('".to_string()).into(),
             );
         }
 
-        if !trimmed.ends_with(")") {
+        if !trimmed.ends_with(')') {
             return Err(
                 ErrorKind::ParseError(s.to_string(), "Must end with ')'".to_string()).into(),
             );

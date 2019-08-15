@@ -31,15 +31,13 @@ impl Progress {
     }
 
     pub fn check_update(&mut self) {
-        if self.last_line_time.is_none() {
-            self.update()
+        if let Some(last) = self.last_line_time {
+            if last.elapsed() > Duration::from_millis(500) {
+                self.update();
+                io::stderr().flush().unwrap();
+            }
         } else {
-            self.last_line_time.map(|last| {
-                if last.elapsed() > Duration::from_millis(500) {
-                    self.update();
-                    io::stderr().flush().unwrap();
-                }
-            });
+            self.update()
         }
     }
 

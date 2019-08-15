@@ -44,7 +44,11 @@ impl Color {
     }
 
     pub fn from_rgb(r: u8, g: u8, b: u8) -> Result<Self> {
-        Color::new((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) / 255.0)
+        Color::new(
+            f32::from(r) / 255.0,
+            f32::from(g) / 255.0,
+            f32::from(b) / 255.0,
+        )
     }
 
     // h: [0-360]
