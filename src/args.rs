@@ -1,6 +1,7 @@
 use std::convert::TryFrom;
 use std::env;
 use std::ffi::OsString;
+use std::path::PathBuf;
 use std::str::FromStr;
 
 use clap::{App, AppSettings, Arg, ArgMatches};
@@ -19,7 +20,9 @@ const NUM_SAMPLES: (&str, &str) = ("num_samples", "5");
 const SCALE: (&str, &str) = ("scale", "1");
 const SCREEN_HEIGHT: (&str, &str) = ("screen_height", "240");
 const SCREEN_WIDTH: (&str, &str) = ("screen_width", "320");
+const WRITE: &str = "write";
 const WORLD: (&str, &str) = ("world", "threeballs");
+const WORLDS: &str = "worlds";
 
 pub struct Config {
     pub hue: f32,
@@ -35,7 +38,10 @@ pub struct Config {
     pub camera_to: Vec3,
     pub camera_up: Vec3,
 
+    pub write: Option<PathBuf>,
     pub world: Worlds,
+
+    pub worlds: Option<Vec<OsString>>,
 }
 
 impl Config {
@@ -58,7 +64,12 @@ impl<'a> TryFrom<Args<'a>> for Config {
             screen_width: args.parsed_value(SCREEN_WIDTH)?,
             screen_height: args.parsed_value(SCREEN_HEIGHT)?,
             num_samples: args.parsed_value(NUM_SAMPLES)?,
+            write: args.value_if_present(WRITE)?,
             world: args.parsed_value(WORLD)?,
+            worlds: args
+                .matches
+                .values_of_os(WORLDS)
+                .map(|i| i.map(|s| s.to_owned()).collect::<Vec<OsString>>()),
         })
     }
 }
@@ -101,6 +112,10 @@ impl<'a> Args<'a> {
             .ok_or_else(|| ErrorKind::MissingParam(desc.0.to_string()).into())
             .and_then(|cow| Ok(T::from_str(&cow)?))
     }
+
+    fn value_if_present(&self, name: &str) -> Result<Option<PathBuf>> {
+        Ok(self.matches.value_of_os(name).map(PathBuf::from))
+    }
 }
 
 fn parse_from<'a, I, T>(itr: I) -> Result<ArgMatches<'a>>
@@ -114,6 +129,11 @@ where
         .version(crate_version!())
         .setting(AppSettings::StrictUtf8)
         .setting(AppSettings::UnifiedHelpMessage)
+        .arg(Arg::with_name(WORLDS)
+             .multiple(true)
+             .conflicts_with(WORLD.0)
+             .help("YAML files containing worlds to render.")
+        )
         .arg(
             Arg::with_name(SCREEN_WIDTH.0)
                 .long(SCREEN_WIDTH.0)
@@ -196,6 +216,12 @@ where
                 .visible_alias("hue")
                 .default_value(HUE.1)
                 .help("Base hue for the background.")
+        )
+        .arg(
+            Arg::with_name(WRITE)
+                .long(WRITE)
+                .short("o")
+                .takes_value(true)
         )
         .get_matches_from_safe(itr)
         .map_err(Error::from)

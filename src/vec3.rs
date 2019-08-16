@@ -2,9 +2,11 @@ use std::f32;
 use std::ops;
 use std::str::FromStr;
 
+use serde::{Deserialize, Serialize};
+
 use crate::errors::*;
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Vec3(f32, f32, f32);
 
 impl Vec3 {

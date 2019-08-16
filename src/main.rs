@@ -1,4 +1,6 @@
 use std::f32;
+use std::fs::File;
+use std::path::PathBuf;
 
 use rays::errors::*;
 use rays::{
@@ -27,7 +29,7 @@ fn color(ray: &Ray, hit_test: &impl HitTest, hue: f32, depth: usize, max_depth: 
     }
 }
 
-fn path_trace_inc(config: &Config) -> Result<()> {
+fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     let camera = Camera::new_from_to(
         &config.camera_from,
@@ -39,7 +41,7 @@ fn path_trace_inc(config: &Config) -> Result<()> {
 
     let height = screen.height() as f32;
     let width = screen.width() as f32;
-    let world = load_world(config.world);
+    //    let world = load_world(config.world);
     let mut pg = Progress::new(config.num_samples as u64);
 
     let mut ifb = IncrementalFrameBuffer::new(screen.width(), screen.height())?;
@@ -60,8 +62,7 @@ fn path_trace_inc(config: &Config) -> Result<()> {
     }
     pg.finish_and_clear();
 
-    screen.wait()?;
-    Ok(())
+    screen.wait()
 }
 
 fn sample_color(
@@ -79,7 +80,7 @@ fn sample_color(
     color(&ray, world, config.hue, 0, config.max_depth)
 }
 
-fn path_trace(config: &Config) -> Result<()> {
+fn path_trace(config: &Config, world: &World) -> Result<()> {
     let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
     let camera = Camera::new_from_to(
         &config.camera_from,
@@ -93,7 +94,7 @@ fn path_trace(config: &Config) -> Result<()> {
         let height = fb.height() as f32;
         let width = fb.width() as f32;
 
-        let world = load_world(config.world);
+        //        let world = load_world(config.world);
 
         let mut pg = Progress::new((height * width) as u64);
         for y in 0..config.screen_height {
@@ -117,9 +118,38 @@ fn path_trace(config: &Config) -> Result<()> {
     Ok(())
 }
 
+fn add_extension_if_missing(path: &PathBuf, ext: &str) -> PathBuf {
+    let mut result = path.clone();
+    if path.extension().is_none() {
+        result.set_extension(ext);
+    }
+    result
+}
+
+fn get_world(config: &Config) -> Result<World> {
+    Ok(config
+        .worlds
+        .as_ref()
+       .map(|files| {
+           let file = File::open(&files[0]).unwrap(); // TODO
+           serde_yaml::from_reader::<_, World>(file).unwrap() // TODO
+       })
+       .unwrap_or_else(|| load_world(config.world)))
+}
+
 fn real_main() -> Result<()> {
     let config = Config::new()?;
-    path_trace_inc(&config)
+    let world = get_world(&config)?;
+
+    if let Some(write) = &config.write {
+        let filename = add_extension_if_missing(&write, "yaml");
+        let file = File::create(filename).unwrap(); // TODO
+        serde_yaml::to_writer(file, &world).unwrap(); // TODO
+    }
+
+    path_trace_inc(&config, &world)?;
+
+    Ok(())
 }
 
 fn main() {

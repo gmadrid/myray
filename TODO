@@ -4,3 +4,4 @@
 - --vfov cmdline arg
 - saving images
 - multi-threading
+- get rid of 'unwraps' in main.rs
