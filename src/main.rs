@@ -130,11 +130,16 @@ fn get_world(config: &Config) -> Result<World> {
     Ok(config
         .worlds
         .as_ref()
-       .map(|files| {
-           let file = File::open(&files[0]).unwrap(); // TODO
-           serde_yaml::from_reader::<_, World>(file).unwrap() // TODO
-       })
-       .unwrap_or_else(|| load_world(config.world)))
+        .map(|files| {
+            files.into_iter().fold(vec![], |v, filename| {
+                let file = File::open(filename).unwrap(); // TODO
+                let small_world = serde_yaml::from_reader::<_, World>(file).unwrap(); // TODO
+                v.into_iter()
+                    .chain(small_world.into_iter())
+                    .collect::<World>()
+            })
+        })
+        .unwrap_or_else(|| load_world(config.world)))
 }
 
 fn real_main() -> Result<()> {
