@@ -1,7 +1,6 @@
-- Read/write worlds from/to file.
-  - This is probably important for debugging some stuff.
 - depth map
 - --vfov cmdline arg
 - saving images
 - multi-threading
 - get rid of 'unwraps' in main.rs
+- allow switching between the two tracers.
