@@ -30,7 +30,7 @@ fn color(ray: &Ray, hit_test: &impl HitTest, hue: f32, depth: usize, max_depth: 
 }
 
 fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
-    let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
+    let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale)?;
     let camera = Camera::new_from_to(
         &config.camera_from,
         &config.camera_to,
@@ -80,7 +80,7 @@ fn sample_color(
 }
 
 fn path_trace(config: &Config, world: &World) -> Result<()> {
-    let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale).unwrap();
+    let mut screen = Screen::new(config.screen_width, config.screen_height, config.scale)?;
     let camera = Camera::new_from_to(
         &config.camera_from,
         &config.camera_to,
@@ -124,19 +124,17 @@ fn add_extension_if_missing(path: &PathBuf, ext: &str) -> PathBuf {
 }
 
 fn get_world(config: &Config) -> Result<World> {
-    Ok(config
-        .worlds
-        .as_ref()
-        .map(|files| {
-            files.into_iter().fold(vec![], |v, filename| {
-                let file = File::open(filename).unwrap(); // TODO
-                let small_world = serde_yaml::from_reader::<_, World>(file).unwrap(); // TODO
-                v.into_iter()
-                    .chain(small_world.into_iter())
-                    .collect::<World>()
-            })
+    if let Some(files) = &config.worlds {
+        files.into_iter().try_fold(vec![], |v, filename| {
+            let file = File::open(filename)?;
+            let small_world = serde_yaml::from_reader::<_, World>(file)?;
+            Ok(v.into_iter()
+                .chain(small_world.into_iter())
+                .collect::<World>())
         })
-        .unwrap_or_else(|| load_world(config.world)))
+    } else {
+        load_world(config.world)
+    }
 }
 
 fn real_main() -> Result<()> {
@@ -166,3 +164,4 @@ fn main() {
         }
     }
 }
+

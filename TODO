@@ -4,3 +4,4 @@
 - multi-threading
 - get rid of 'unwraps' in main.rs
 - allow switching between the two tracers.
+- add second level of progress meter

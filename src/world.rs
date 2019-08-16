@@ -31,12 +31,11 @@ impl FromStr for Worlds {
     }
 }
 
-pub fn load_world(world: Worlds) -> World {
+pub fn load_world(world: Worlds) -> Result<World> {
     match world {
         Worlds::ThreeBalls => three_balls(),
         Worlds::Random => random_scene(),
     }
-    .unwrap()
 }
 
 fn three_balls() -> Result<World> {
