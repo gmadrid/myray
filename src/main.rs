@@ -41,7 +41,6 @@ fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
 
     let height = screen.height() as f32;
     let width = screen.width() as f32;
-    //    let world = load_world(config.world);
     let mut pg = Progress::new(config.num_samples as u64);
 
     let mut ifb = IncrementalFrameBuffer::new(screen.width(), screen.height())?;
@@ -93,8 +92,6 @@ fn path_trace(config: &Config, world: &World) -> Result<()> {
     screen.one_frame(|fb| {
         let height = fb.height() as f32;
         let width = fb.width() as f32;
-
-        //        let world = load_world(config.world);
 
         let mut pg = Progress::new((height * width) as u64);
         for y in 0..config.screen_height {
