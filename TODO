@@ -7,5 +7,3 @@
 - add second level of progress meter
 - move rendering and coloring changes out of main and into the lib.
 - write maybe_add_extension() in util.rs (and figure out a better name)
-- replace my homegrown args parsing with clap::value_t!()
-- move to structopt
