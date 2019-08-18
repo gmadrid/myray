@@ -17,9 +17,9 @@ impl Camera {
 
     pub fn new_with_vert_fov(vfov: f32, aspect: f32) -> Result<Camera> {
         Camera::new_from_to(
-            &Vec3::new(0.0, 0.0, 0.0),
-            &Vec3::new(0.0, 0.0, -1.0),
-            &Vec3::new(0.0, 1.0, 0.0),
+            &Vec3::cartesian(0.0, 0.0, 0.0),
+            &Vec3::cartesian(0.0, 0.0, -1.0),
+            &Vec3::cartesian(0.0, 1.0, 0.0),
             vfov,
             aspect,
         )

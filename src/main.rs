@@ -46,7 +46,7 @@ fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
         &config.look_from,
         &config.look_at,
         &config.look_up,
-        90.0,
+        config.vfov,
         screen.height() as f32 / screen.width() as f32,
     )?;
 

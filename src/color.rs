@@ -85,7 +85,7 @@ impl Color {
     }
 
     pub fn as_vec(&self) -> Vec3 {
-        Vec3::new(self.r, self.g, self.b)
+        Vec3::cartesian(self.r, self.g, self.b)
     }
 }
 

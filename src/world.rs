@@ -41,21 +41,21 @@ pub fn load_world(world: Worlds) -> Result<World> {
 fn three_balls() -> Result<World> {
     Ok(vec![
         Sphere::new(
-            &Vec3::new(0.0, 0.0, -1.0),
+            &Vec3::cartesian(0.0, 0.0, -1.0),
             0.5,
             Lambertian::new(Color::new(0.8, 0.3, 0.3)?),
         )?,
         Sphere::new(
-            &Vec3::new(0.0, -100.5, -1.0),
+            &Vec3::cartesian(0.0, -100.5, -1.0),
             100.0,
             Lambertian::new(Color::new(0.3, 0.3, 0.8)?),
         )?,
         Sphere::new(
-            &Vec3::new(1.0, 0.0, -1.0),
+            &Vec3::cartesian(1.0, 0.0, -1.0),
             0.5,
             Metal::new(Color::new(0.8, 0.6, 0.2)?),
         )?,
-        Sphere::new(&Vec3::new(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
+        Sphere::new(&Vec3::cartesian(-1.0, 0.0, -1.0), 0.5, Dielectric::new(1.5))?,
     ])
 }
 
@@ -63,7 +63,7 @@ fn random_scene() -> Result<World> {
     let mut world = Vec::new();
 
     world.push(Sphere::new(
-        &Vec3::new(0.0, -1000.0, 0.0),
+        &Vec3::cartesian(0.0, -1000.0, 0.0),
         1000.0,
         Lambertian::new(Color::new(0.5, 0.5, 0.5)?),
     )?);
@@ -71,12 +71,12 @@ fn random_scene() -> Result<World> {
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = unit_random();
-            let center = Vec3::new(
+            let center = Vec3::cartesian(
                 a as f32 + 0.9 * unit_random(),
                 0.2,
                 b as f32 + 0.9 + unit_random(),
             );
-            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+            if (center - Vec3::cartesian(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
                     world.push(Sphere::new(
@@ -89,6 +89,7 @@ fn random_scene() -> Result<World> {
                         )?),
                     )?);
                 } else if choose_mat < 0.95 {
+                    // metal
                     world.push(Sphere::new(
                         &center,
                         0.2,
@@ -98,23 +99,26 @@ fn random_scene() -> Result<World> {
                             0.5 * (1.0 + unit_random()),
                         )?),
                     )?);
+                } else {
+                    // glass
+                    world.push(Sphere::new(&center, 0.2, Dielectric::new(1.5))?)
                 }
             }
         }
     }
 
     world.push(Sphere::new(
-        &Vec3::new(0.0, 1.0, 0.0),
+        &Vec3::cartesian(0.0, 1.0, 0.0),
         1.0,
         Dielectric::new(1.5),
     )?);
     world.push(Sphere::new(
-        &Vec3::new(-4.0, 1.0, 0.0),
+        &Vec3::cartesian(-4.0, 1.0, 0.0),
         1.0,
         Lambertian::new(Color::new(0.4, 0.2, 0.1)?),
     )?);
     world.push(Sphere::new(
-        &Vec3::new(4.0, 1.0, 0.0),
+        &Vec3::cartesian(4.0, 1.0, 0.0),
         1.0,
         Metal::new(Color::new(0.7, 0.6, 0.5)?),
     )?);

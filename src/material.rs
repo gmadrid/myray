@@ -128,7 +128,7 @@ impl Material for Dielectric {
             Ray::new(hit_record.point, refracted.unwrap())
         };
 
-        let attenuation = Vec3::new(1.0, 1.0, 1.0);
+        let attenuation = Vec3::cartesian(1.0, 1.0, 1.0);
         Some((scattered, attenuation))
     }
 }

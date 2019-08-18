@@ -15,15 +15,15 @@ pub struct Config {
     pub hue: f32,
 
     /// Point at the head of the camera ray.
-    #[structopt(long, default_value = "(0,0,-1)")]
+    #[structopt(long, default_value = "0,0,-1")]
     pub look_at: Vec3, // TODO
 
     /// The origin point of the camera normal ray.
-    #[structopt(long, default_value = "(0,0,0)")]
+    #[structopt(long, default_value = "0,0,0")]
     pub look_from: Vec3, // TODO
 
     /// TODO: complete this description.
-    #[structopt(long, default_value = "(0,1,0)")]
+    #[structopt(long, default_value = "0,1,0")]
     pub look_up: Vec3, // TODO
 
     /// Max depth for scattered/reflected rays.
@@ -46,6 +46,10 @@ pub struct Config {
     /// Width of the final image in pixels.
     #[structopt(long, short = "w", default_value = "320", visible_alias = "sw")]
     pub screen_width: usize,
+
+    /// Angle (in degrees) of the camera fovea on the vertical axis.
+    #[structopt(long, default_value = "90")]
+    pub vfov: f32,
 
     /// Write a YAML description of the World to this file before rendering.
     #[structopt(long = "write_world", short = "o", parse(from_os_str))]
