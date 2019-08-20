@@ -52,7 +52,7 @@ fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
 
     let height = screen.height() as f32;
     let width = screen.width() as f32;
-    let mut pg = Progress::new(config.num_samples as u64);
+    let mut pg = Progress::new(u64::from(config.num_samples));
 
     let mut ifb = IncrementalFrameBuffer::new(screen.width(), screen.height())?;
 
@@ -65,7 +65,7 @@ fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
                     ifb.set(x, y, color);
                 }
             }
-            ifb.copy_to_fb(n as u32, fb);
+            ifb.copy_to_fb(u32::from(n), fb);
             Ok(())
         })?;
 
