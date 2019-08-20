@@ -6,7 +6,7 @@ pub struct HitRecord<'a> {
     pub t: f32,
     pub point: Vec3,
     pub normal: Vec3,
-    pub material: &'a Material,
+    pub material: &'a dyn Material,
 }
 
 pub trait HitTest {
