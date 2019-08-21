@@ -1,3 +1,6 @@
+- When creating camera, sanity-check inputs to ensure that all vectors are valid.
+- Allow saving/loading of entire config, encluding the world and the camera.
+
 - depth map
 - --vfov cmdline arg
 - saving images

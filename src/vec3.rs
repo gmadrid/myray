@@ -53,8 +53,17 @@ impl Vec3 {
         f32::sqrt(self.squared_length())
     }
 
-    pub fn unit_vector(&self) -> Vec3 {
-        self / self.length()
+    pub fn unit_vector(&self) -> Result<Vec3> {
+        let length = self.length();
+        if length == 0.0 {
+            Err(ErrorKind::InvalidParam(
+                0.0,
+                "Cannot take unit_vector of a zero-length vector.".to_string(),
+            )
+            .into())
+        } else {
+            Ok(self / self.length())
+        }
     }
 }
 

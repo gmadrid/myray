@@ -19,23 +19,23 @@ fn color(
     depth: u8,
     max_depth: u8,
     background: &Color,
-) -> Color {
+) -> Result<Color> {
     if let Some(hit_record) = hit_test.hit_test(ray, 0.001, f32::MAX) {
         if depth >= max_depth {
-            return Color::black();
+            return Ok(Color::black());
         }
 
-        if let Some((scattered, attenuation)) = hit_record.material.scatter(ray, &hit_record) {
-            return Color::from(
+        if let Some((scattered, attenuation)) = hit_record.material.scatter(ray, &hit_record)? {
+            return Ok(Color::from(
                 attenuation
-                    * color(&scattered, hit_test, hue, depth + 1, max_depth, background).as_vec(),
-            );
+                    * color(&scattered, hit_test, hue, depth + 1, max_depth, background)?.as_vec(),
+            ));
         }
-        Color::black()
+        Ok(Color::black())
     } else {
-        let unit_direction = ray.direction().unit_vector();
+        let unit_direction = ray.direction().unit_vector()?;
         let t = 0.5 * (unit_direction.y() + 1.0);
-        gradient(t, &Color::white(), background)
+        Ok(gradient(t, &Color::white(), background))
     }
 }
 
@@ -61,7 +61,7 @@ fn path_trace_inc(config: &Config, world: &World) -> Result<()> {
             for y in 0..config.screen_height {
                 for x in 0..config.screen_width {
                     let color =
-                        sample_color(config, &world, &camera, x, y, width, height, &background);
+                        sample_color(config, &world, &camera, x, y, width, height, &background)?;
                     ifb.set(x, y, color);
                 }
             }
@@ -85,7 +85,7 @@ fn sample_color(
     width: f32,
     height: f32,
     background: &Color,
-) -> Color {
+) -> Result<Color> {
     let u = (x as f32 + unit_random()) / width;
     let v = (y as f32 + unit_random()) / height;
     let ray = camera.get_ray(u, v);

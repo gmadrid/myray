@@ -12,32 +12,32 @@ extern crate structopt;
 
 pub mod errors {
     error_chain! {
-            errors {
-                InvalidParam(val: f32, t: String) {
-                    description("Value invalid")
-                    display("Value invalid ({}): {}", t, val)
-                }
-                MissingParam(val: String) {
-                    description("Missing command line argument.")
-                    display("'{}' must be specified (or have a default).", val)
-                }
-                OutOfRange(val: f32, min: f32, max: f32) {
-                    description("Value out of range.")
-                    display("Value, {}, out of range: [{}, {}]", val, min, max)
-                }
-                ParseError(val: String, t: String) {
-                    description("Parse error")
-                    display("Cannot parse ({}): \"{}\"", t, val)
-                }
+        errors {
+            InvalidParam(val: f32, t: String) {
+                description("Value invalid")
+                display("Value invalid ({}): {}", t, val)
             }
-            foreign_links {
-                IoError(std::io::Error);
-                MiniFBError(minifb::Error);
-                ParseIntError(std::num::ParseIntError);
-                ParseFloatError(std::num::ParseFloatError);
-                SerdeYamlError(serde_yaml::Error);
+            MissingParam(val: String) {
+                description("Missing command line argument.")
+                display("'{}' must be specified (or have a default).", val)
+            }
+            OutOfRange(val: f32, min: f32, max: f32) {
+                description("Value out of range.")
+                display("Value, {}, out of range: [{}, {}]", val, min, max)
+            }
+            ParseError(val: String, t: String) {
+                description("Parse error")
+                display("Cannot parse ({}): \"{}\"", t, val)
             }
         }
+        foreign_links {
+            IoError(std::io::Error);
+            MiniFBError(minifb::Error);
+            ParseIntError(std::num::ParseIntError);
+            ParseFloatError(std::num::ParseFloatError);
+            SerdeYamlError(serde_yaml::Error);
+        }
+    }
 
 }
 

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::color::Color;
+use crate::errors::*;
 use crate::hittest::HitRecord;
 use crate::ray::Ray;
 use crate::unit_random::unit_random;
@@ -9,7 +10,7 @@ use crate::vec3::{dot, Vec3};
 
 #[typetag::serde(tag = "type")]
 pub trait Material {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)>;
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Result<Option<(Ray, Vec3)>>;
 }
 
 #[derive(Serialize, Deserialize)]
@@ -27,10 +28,10 @@ impl Lambertian {
 
 #[typetag::serde]
 impl Material for Lambertian {
-    fn scatter(&self, _: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, _: &Ray, hit_record: &HitRecord) -> Result<Option<(Ray, Vec3)>> {
         let target = hit_record.point + hit_record.normal + random_in_unit_sphere();
         let scattered = Ray::new(hit_record.point, target - hit_record.point);
-        Some((scattered, self.albedo))
+        Ok(Some((scattered, self.albedo)))
     }
 }
 
@@ -53,13 +54,14 @@ fn reflect(vec: &Vec3, normal: &Vec3) -> Vec3 {
 
 #[typetag::serde]
 impl Material for Metal {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
-        let reflected = reflect(&ray.direction().unit_vector(), &hit_record.normal);
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Result<Option<(Ray, Vec3)>> {
+        let reflected = reflect(&ray.direction().unit_vector()?, &hit_record.normal);
         let scattered = Ray::new(hit_record.point, reflected);
         let attenuation = self.albedo;
-        if_then(dot(scattered.direction(), &hit_record.normal) > 0.0, || {
-            Some((scattered, attenuation))
-        })
+        Ok(if_then(
+            dot(scattered.direction(), &hit_record.normal) > 0.0,
+            || Some((scattered, attenuation)),
+        ))
     }
 }
 
@@ -74,13 +76,13 @@ impl Dielectric {
     }
 }
 
-fn refract(vec: &Vec3, normal: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
-    let uv = vec.unit_vector();
+fn refract(vec: &Vec3, normal: &Vec3, ni_over_nt: f32) -> Result<Option<Vec3>> {
+    let uv = vec.unit_vector()?;
     let dt = dot(&uv, normal);
     let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
-    if_then(discriminant > 0.0, || {
+    Ok(if_then(discriminant > 0.0, || {
         Some(ni_over_nt * (uv - normal * dt) - normal * f32::sqrt(discriminant))
-    })
+    }))
 }
 
 fn schlick(cosine: f32, ref_idx: f32) -> f32 {
@@ -91,7 +93,7 @@ fn schlick(cosine: f32, ref_idx: f32) -> f32 {
 
 #[typetag::serde]
 impl Material for Dielectric {
-    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Option<(Ray, Vec3)> {
+    fn scatter(&self, ray: &Ray, hit_record: &HitRecord) -> Result<Option<(Ray, Vec3)>> {
         let dotp = dot(ray.direction(), &hit_record.normal);
         let (outward_normal, ni_over_nt, cosine) = if dotp > 0.0 {
             (
@@ -109,7 +111,7 @@ impl Material for Dielectric {
 
         let mut refracted = None;
         let reflect_prob =
-            if let Some(refracted_val) = refract(ray.direction(), &outward_normal, ni_over_nt) {
+            if let Some(refracted_val) = refract(ray.direction(), &outward_normal, ni_over_nt)? {
                 refracted = Some(refracted_val);
                 schlick(cosine, self.refractive_index)
             } else {
@@ -129,6 +131,6 @@ impl Material for Dielectric {
         };
 
         let attenuation = Vec3::cartesian(1.0, 1.0, 1.0);
-        Some((scattered, attenuation))
+        Ok(Some((scattered, attenuation)))
     }
 }
