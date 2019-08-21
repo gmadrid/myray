@@ -1,0 +1,42 @@
+---
+- center:
+    - 0.0
+    - 0.0
+    - -1.0
+  radius: 0.5
+  material:
+    type: Lambertian
+    albedo:
+      - 0.800000011920929
+      - 0.30000001192092898
+      - 0.30000001192092898
+- center:
+    - 0.0
+    - -100.5
+    - -1.0
+  radius: 100.0
+  material:
+    type: Lambertian
+    albedo:
+      - 0.30000001192092898
+      - 0.30000001192092898
+      - 0.800000011920929
+- center:
+    - 1.0
+    - 0.0
+    - -1.0
+  radius: 0.5
+  material:
+    type: Metal
+    albedo:
+      - 0.800000011920929
+      - 0.6000000238418579
+      - 0.20000000298023225
+- center:
+    - -1.0
+    - 0.0
+    - -1.0
+  radius: 0.5
+  material:
+    type: Dielectric
+    refractive_index: 1.5
