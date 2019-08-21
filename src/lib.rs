@@ -31,7 +31,6 @@ pub mod errors {
                 }
             }
             foreign_links {
-    //            ClapError(clap::Error);
                 IoError(std::io::Error);
                 MiniFBError(minifb::Error);
                 ParseIntError(std::num::ParseIntError);
