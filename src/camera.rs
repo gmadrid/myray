@@ -32,12 +32,14 @@ impl Camera {
         vfov: f32,
         aspect: f32,
     ) -> Result<Camera> {
+        // TODO: check that lookfrom and lookat are not the same.
         let theta = vfov * std::f32::consts::PI / 180.0;
         let half_height = f32::tan(theta / 2.0);
         let half_width = half_height * aspect;
         let origin = lookfrom;
-        let w = (lookfrom - lookat).unit_vector();
-        let u = cross(&vup, &w).unit_vector();
+        // TODO: Check that w,u,v are all non-zero, non-NaN vectors.
+        let w = (lookfrom - lookat).unit_vector()?;
+        let u = cross(&vup, &w).unit_vector()?;
         let v = cross(&w, &u);
 
         Ok(Camera {
