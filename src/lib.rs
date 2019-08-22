@@ -67,6 +67,7 @@ mod pg;
 mod ray;
 mod screen;
 mod sphere;
+mod tracer;
 mod unit_random;
 mod util;
 mod vec3;

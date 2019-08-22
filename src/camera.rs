@@ -10,6 +10,14 @@ pub struct Camera {
     vertical: Vec3,
 }
 
+impl Default for Camera {
+    fn default() -> Self {
+        // unwrap: Ok because default should never fail.
+        // TODO: make Camera::new never fail.
+        Camera::new().unwrap()
+    }
+}
+
 impl Camera {
     pub fn new() -> Result<Camera> {
         Camera::new_with_vert_fov(90.0, 2.0)
